@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <h1>Register for Pawsocial</h1>
+
+        {{ form_errors(registrationForm) }}
+
+        {{ form_start(registrationForm) }}
+            {{ form_row(registrationForm.email, {
+                'attr': {'class': 'form-control'}
+            }) }}
+            {{ form_row(registrationForm.plainPassword, {
+                'label': 'Password'
+            }) }}
+            {{ form_row(registrationForm.agreeTerms) }}
+
+            <button type="submit" class="btn">Register</button>
+        {{ form_end(registrationForm) }}
+        
+        <p style="margin-top: 20px;">
+            Already have an account? <a href="{{ path('app_login') }}">Log in</a>
+        </p>
+    </div>
+{% endblock %}

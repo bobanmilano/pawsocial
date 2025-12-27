@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Pawsocial{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🐾</text></svg>">
+        {% block stylesheets %}
+            <style>
+                body { font-family: system-ui, sans-serif; margin: 0; background: #f0f2f5; color: #1c1e21; }
+                .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+                .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                h1 { color: #6e48aa; }
+                .btn { display: inline-block; padding: 10px 20px; background: #6e48aa; color: white; text-decoration: none; border-radius: 5px; }
+            </style>
+        {% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+        <div class="container">
+            {% block body %}{% endblock %}
+        </div>
+    </body>
+</html>
