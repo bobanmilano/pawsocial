@@ -59,8 +59,18 @@ class ProfileController extends AbstractController
         // Actually, looking at User.php previously, we didn't see `animals` property there yet?
         // Let's double check User.php content. If missing, we fetch via repo.
 
+        /** @var \App\Repository\PostRepository $postRepository */
+        // We can access posts via relationship or repo. Relationship is easier but unsorted.
+        // Let's rely on relationship for now or we can sort in memory.
+        // Actually, let's just pass the posts from the user object, assuming we might want to sort them in Twig or here.
+        // Better: let's fetch them sorted via specialized logic or simply access them.
+
+        // For simple reverse chronological order, let's use the criteria or sort in Twig.
+        // Or simpler: access via getter.
+
         return $this->render('profile/my_pack.html.twig', [
             'user' => $user,
+            'posts' => $user->getPosts(), // We can sort in Twig: user.posts|sort((a, b) => b.createdAt <=> a.createdAt)
         ]);
     }
 

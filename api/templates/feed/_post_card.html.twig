@@ -1,0 +1,60 @@
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3 pb-0">
+        <div class="d-flex align-items-center">
+            {% if post.author.imageName %}
+                <img src="{{ asset('/uploads/avatars/' ~ post.author.imageName) }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+            {% else %}
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">👤</div>
+            {% endif %}
+            <div>
+                <h6 class="mb-0 fw-bold">{{ post.author.firstName ?? post.author.email }}</h6>
+                <small class="text-muted">{{ post.createdAt|date('M j, Y • H:i') }}</small>
+                {% if not post.showInFeed %}
+                    <span class="badge bg-secondary ms-2" title="Visible only on profile">🔒 Profile Only</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="dropdown">
+            <button class="btn btn-link text-muted p-0 text-decoration-none" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="fs-4">⋮</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                {% if app.user == post.author %}
+                     <li>
+                        <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                            <button type="submit" class="dropdown-item text-danger">🗑️ Delete</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li>
+                        {# Link to Report functionality (to be implemented) #}
+                        <a class="dropdown-item" href="{{ path('app_report_post', {'id': post.id}) }}">⚠️ Report</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <p class="card-text fs-5">{{ post.content|nl2br }}</p>
+    </div>
+
+    {% if post.imageName %}
+        <img src="{{ asset('/uploads/posts/' ~ post.imageName) }}" class="card-img-bottom" alt="Post Image">
+    {% elseif post.videoUrl %}
+        {% set videoId = post.youTubeId %}
+        {% if videoId %}
+            <div class="ratio ratio-16x9">
+                <iframe src="https://www.youtube.com/embed/{{ videoId }}" title="YouTube video" allowfullscreen></iframe>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <div class="card-footer bg-white border-top-0 d-flex justify-content-around py-3">
+        <button class="btn btn-link text-decoration-none text-muted">❤️ Like</button>
+        <button class="btn btn-link text-decoration-none text-muted">💬 Comment</button>
+        <button class="btn btn-link text-decoration-none text-muted">📤 Share</button>
+    </div>
+</div>

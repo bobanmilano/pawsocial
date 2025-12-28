@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Feed{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            {# Posting Form #}
+            {% if form %}
+                <div class="card shadow-sm mb-4 border-0">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-3">Share a moment 🐾</h5>
+                        {{ form_start(form) }}
+                            {{ form_widget(form.content, {'attr': {'class': 'form-control border-0 bg-light', 'rows': 3, 'placeholder': "What's your pet up to?"}}) }}
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="d-flex gap-2">
+                                    {# Setup toggles for image/video later, simply show fields for now #}
+                                    <button type="button" class="btn btn-sm btn-light rounded-pill" data-bs-toggle="collapse" data-bs-target="#media-fields">
+                                        📷 / 🎥 Add Media
+                                    </button>
+                                </div>
+                                <button type="submit" class="btn btn-primary rounded-pill px-4">Post</button>
+                            </div>
+
+                            <div class="collapse mt-3" id="media-fields">
+                                <div class="card card-body bg-light border-0">
+                                    {{ form_row(form.imageFile) }}
+                                    <div class="text-center text-muted my-2">- OR -</div>
+                                    {{ form_row(form.videoUrl) }}
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                {{ form_row(form.showInFeed) }}
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {# Feed Stream #}
+            <div id="feed-stream">
+                {% for post in posts %}
+                    {% include 'feed/_post_card.html.twig' with {'post': post} %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <h3>No posts yet! 🦗</h3>
+                        <p class="text-muted">Be the first to share something with the pack.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

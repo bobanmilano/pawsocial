@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Messages{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="mb-4">Admin Inbox 📥</h1>
+
+    <div class="list-group shadow-sm">
+        {% for msg in messages %}
+            <div class="list-group-item list-group-item-action" aria-current="true">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1 text-primary">{{ msg.sender.firstName ?? msg.sender.email }}</h5>
+                    <small class="text-muted">{{ msg.createdAt|date('Y-m-d H:i') }}</small>
+                </div>
+                <p class="mb-1">{{ msg.message }}</p>
+                {% if msg.relatedPost %}
+                    <small class="text-muted">
+                        Ref: <a href="{{ path('app_feed') }}#post-{{ msg.relatedPost.id }}">Post #{{ msg.relatedPost.id }}</a>
+                    </small>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">No messages properly received yet.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -44,9 +44,10 @@ class UserProfileType extends AbstractType
             ->add('imageFile', VichImageType::class, [
                 'required' => false,
                 'allow_delete' => true,
-                'download_uri' => false, // We will handle display manually
-                'image_uri' => true,
+                'download_uri' => false,
+                'image_uri' => false,
                 'label' => 'Profile Picture',
+                'delete_label' => 'Delete current image?', // Explicitly set label
                 'asset_helper' => true,
             ])
         ;

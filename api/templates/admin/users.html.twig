@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Users{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>User Management 👥</h1>
+        <a href="{{ path('app_admin_messages') }}" class="btn btn-outline-secondary">Go to Messages</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">User</th>
+                            <th>Role/Type</th>
+                            <th>Stats</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        {% if user.imageName %}
+                                            <img src="{{ asset('/uploads/avatars/' ~ user.imageName) }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">👤</div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="fw-bold">{{ user.firstName ? user.firstName ~ ' ' ~ user.lastName : 'N/A' }}</div>
+                                            <small class="text-muted">{{ user.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge {{ user.accountType == 'commercial' ? 'bg-warning text-dark' : 'bg-info text-dark' }}">{{ user.accountType|capitalize }}</span>
+                                    <br>
+                                    <small class="text-muted">
+                                        {% if 'ROLE_ADMIN_USER' in user.roles %}👑 Admin
+                                        {% elseif 'ROLE_PREMIUM_USER' in user.roles %}💎 Premium
+                                        {% elseif 'ROLE_GOLD_USER' in user.roles %}🥇 Gold
+                                        {% elseif 'ROLE_COMMERCIAL_USER' in user.roles %}🏢 Commercial
+                                        {% else %}👤 Base{% endif %}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-3">
+                                        <span title="Pets">🐾 {{ user.animals|length }}</span>
+                                        <span title="Posts">📝 {{ user.posts|length }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            Change Role
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><h6 class="dropdown-header">Private Tiers</h6></li>
+                                            <li>
+                                                <form action="{{ path('app_admin_change_role', {id: user.id, role: 'base'}) }}" method="post">
+                                                    <button class="dropdown-item">👤 Base User</button>
+                                                </form>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><h6 class="dropdown-header">Commercial Tiers</h6></li>
+                                            <li>
+                                                <form action="{{ path('app_admin_change_role', {id: user.id, role: 'gold'}) }}" method="post">
+                                                    <button class="dropdown-item">🥇 Gold User</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form action="{{ path('app_admin_change_role', {id: user.id, role: 'premium'}) }}" method="post">
+                                                    <button class="dropdown-item">💎 Premium User</button>
+                                                </form>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form action="{{ path('app_admin_change_role', {id: user.id, role: 'admin'}) }}" method="post" onsubmit="return confirm('Promote to Admin?');">
+                                                    <button class="dropdown-item text-danger">👑 Make Admin</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

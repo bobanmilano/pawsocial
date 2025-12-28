@@ -11,3 +11,8 @@ vich_uploader:
             uri_prefix: /uploads/animals
             upload_destination: '%kernel.project_dir%/public/uploads/animals'
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+
+        post_image:
+            uri_prefix: /uploads/posts
+            upload_destination: '%kernel.project_dir%/public/uploads/posts'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer

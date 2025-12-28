@@ -87,8 +87,9 @@ class AnimalType extends AbstractType
                 'required' => false,
                 'allow_delete' => true,
                 'download_uri' => false,
-                'image_uri' => true,
+                'image_uri' => false,
                 'label' => 'Pet Photo',
+                'delete_label' => 'Delete current image?',
                 'asset_helper' => true,
             ])
         ;

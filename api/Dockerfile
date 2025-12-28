@@ -34,6 +34,7 @@ RUN set -eux; \
 		zip \
         pdo_pgsql \
         redis \
+        gd \
 	;
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser

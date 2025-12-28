@@ -14,13 +14,19 @@
 
                         {{ form_start(form) }}
                             <div class="row">
-                                <div class="col-md-4 text-center mb-3">
+                                <div class="col-md-4 text-center mb-3" data-controller="image-preview">
                                     {% if app.user.imageName %}
-                                        <img src="{{ asset('/uploads/avatars/' ~ app.user.imageName) }}" class="rounded-circle img-fluid mb-2" style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar">
+                                        <img src="{{ asset('/uploads/avatars/' ~ app.user.imageName) }}" data-image-preview-target="preview" class="rounded-circle img-fluid mb-2" style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar">
                                     {% else %}
+                                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2NjYyIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5ZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjxwYXRoIGQ9Ik0xMiA4djhNMCAxMmgyNCIvPjwvc3ZnPg==" 
+                                             data-image-preview-target="preview" 
+                                             class="rounded-circle img-fluid mb-2 d-none" 
+                                             style="width: 150px; height: 150px; object-fit: cover;" alt="Preview">
                                         <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 150px; height: 150px; font-size: 3rem;">👤</div>
                                     {% endif %}
-                                    {{ form_row(form.imageFile) }}
+                                    
+                                    {{ form_widget(form.imageFile, {'attr': {'data-image-preview-target': 'input', 'data-action': 'change->image-preview#readURL'}}) }}
+                                    {{ form_errors(form.imageFile) }}
                                 </div>
                                 <div class="col-md-8">
                                     <div class="row">

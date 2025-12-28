@@ -76,4 +76,22 @@
             </div>
         {% endif %}
     </div>
+    <div class="posts-section mt-5">
+        <h2 class="h4 border-start border-4 border-info ps-3 mb-4">Your Moments 📸</h2>
+
+        {% if posts is empty %}
+            <div class="text-center text-muted py-5">
+                <p>You haven't posted any moments yet.</p>
+                <a href="{{ path('app_feed') }}" class="btn btn-outline-primary btn-sm rounded-pill">Share a moment</a>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    {% for post in posts|sort((a, b) => b.createdAt <=> a.createdAt) %}
+                        {% include 'feed/_post_card.html.twig' with {'post': post} %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
