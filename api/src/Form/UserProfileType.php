@@ -50,6 +50,15 @@ class UserProfileType extends AbstractType
                 'delete_label' => 'Delete current image?', // Explicitly set label
                 'asset_helper' => true,
             ])
+            ->add('coverImageFile', VichImageType::class, [
+                'required' => false,
+                'allow_delete' => true,
+                'download_uri' => false,
+                'image_uri' => false,
+                'label' => 'Cover Image',
+                'delete_label' => 'Delete current cover?',
+                'asset_helper' => true,
+            ])
         ;
     }
 

@@ -76,4 +76,26 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute('app_admin_users');
     }
+    #[Route('/user/{id}/ban', name: 'app_admin_ban_user', methods: ['POST'])]
+    public function banUser(int $id, \App\Repository\UserRepository $userRepository, \Doctrine\ORM\EntityManagerInterface $entityManager): Response
+    {
+        $user = $userRepository->find($id);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        // Prevent banning yourself if you are an admin
+        if ($user === $this->getUser()) {
+            $this->addFlash('danger', 'You cannot ban yourself.');
+            return $this->redirectToRoute('app_admin_users');
+        }
+
+        $user->setIsBanned(!$user->isBanned());
+        $entityManager->flush();
+
+        $status = $user->isBanned() ? 'banned' : 'unbanned';
+        $this->addFlash('success', sprintf('User %s has been %s.', $user->getEmail(), $status));
+
+        return $this->redirectToRoute('app_admin_users');
+    }
 }

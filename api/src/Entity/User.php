@@ -34,6 +34,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -57,6 +58,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 20)]
     private string $accountType = 'private'; // private, organization, commercial
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isBanned = false;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $firstName = null;
@@ -88,22 +92,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    /**
-     * @var Collection<int, Animal>
-     */
-    #[ORM\OneToMany(targetEntity: Animal::class, mappedBy: 'owner')]
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Post::class, orphanRemoval: true)]
+    private Collection $posts;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: PostLike::class, orphanRemoval: true)]
+    private Collection $postLikes;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Animal::class, orphanRemoval: true)]
     private Collection $animals;
 
-    /**
-     * @var Collection<int, Post>
-     */
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'author', orphanRemoval: true)]
-    private Collection $posts;
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class, orphanRemoval: true)]
+    private Collection $comments;
 
     public function __construct()
     {
-        $this->animals = new ArrayCollection();
         $this->posts = new ArrayCollection();
+        $this->animals = new ArrayCollection();
+        $this->postLikes = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
 
@@ -133,6 +139,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAccountType(string $accountType): static
     {
         $this->accountType = $accountType;
+
+        return $this;
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->isBanned;
+    }
+
+    public function setIsBanned(bool $isBanned): static
+    {
+        $this->isBanned = $isBanned;
 
         return $this;
     }
@@ -229,8 +247,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $data = (array) $this;
         $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
         unset($data["\0" . self::class . "\0imageFile"]);
+        unset($data["\0" . self::class . "\0coverImageFile"]);
 
         return $data;
+    }
+
+    #[Vich\UploadableField(mapping: 'user_cover', fileNameProperty: 'coverImageName')]
+    private ?File $coverImageFile = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $coverImageName = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $coverImageUpdatedAt = null;
+
+    public function setCoverImageFile(?File $imageFile = null): void
+    {
+        $this->coverImageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            $this->coverImageUpdatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getCoverImageFile(): ?File
+    {
+        return $this->coverImageFile;
+    }
+
+    public function setCoverImageName(?string $coverImageName): void
+    {
+        $this->coverImageName = $coverImageName;
+    }
+
+    public function getCoverImageName(): ?string
+    {
+        return $this->coverImageName;
     }
 
     #[\Deprecated]

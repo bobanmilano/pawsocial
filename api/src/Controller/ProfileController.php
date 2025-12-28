@@ -44,7 +44,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ProfileController extends AbstractController
 {
     #[Route('/', name: 'app_my_pack')]
-    public function index(): Response
+    public function index(\App\Repository\PostRepository $postRepository): Response
     {
         // Get current user's animals (Assuming ManyToOne from Animal -> User is set up)
         // Since we didn't add the `animals` OneToMany property to User explicitly in the make loop (we said 'yes' but check logic),
@@ -69,8 +69,9 @@ class ProfileController extends AbstractController
         // Or simpler: access via getter.
 
         return $this->render('profile/my_pack.html.twig', [
-            'user' => $user,
-            'posts' => $user->getPosts(), // We can sort in Twig: user.posts|sort((a, b) => b.createdAt <=> a.createdAt)
+            'profileUser' => $user,
+            'animals' => $user->getAnimals(),
+            'posts' => $postRepository->findProfilePosts($user),
         ]);
     }
 

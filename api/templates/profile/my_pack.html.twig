@@ -3,15 +3,33 @@
 {% block title %}My Pack{% endblock %}
 
 {% block body %}
-    <div class="profile-header text-center mb-5">
-        {% if user.imageName %}
-            <img src="{{ asset('/uploads/avatars/' ~ user.imageName) }}" class="rounded-circle mb-3 shadow" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid white;" alt="Avatar">
+    <div class="profile-header text-center mb-5 position-relative">
+        {# Cover Image Section #}
+        {% if profileUser.coverImageName %}
+            <div class="cover-image-container position-relative mb-5" style="height: 450px; overflow: hidden; border-radius: 0 0 15px 15px;">
+                <picture>
+                    <source media="(max-width: 575px)" srcset="{{ asset('/uploads/covers/' ~ profileUser.coverImageName) | imagine_filter('cover_mobile') }}">
+                    <source media="(max-width: 991px)" srcset="{{ asset('/uploads/covers/' ~ profileUser.coverImageName) | imagine_filter('cover_tablet') }}">
+                    <img src="{{ asset('/uploads/covers/' ~ profileUser.coverImageName) | imagine_filter('cover_desktop') }}" 
+                         alt="Cover Image" 
+                         class="w-100 h-100" 
+                         style="object-fit: cover;">
+                </picture>
+            </div>
+            {# Adjust Avatar Position to overlap cover (75% of 120px = 90px) #}
+            <div class="position-relative" style="margin-top: -90px;">
+        {% else %}
+             <div class="cover-placeholder bg-secondary mb-3" style="height: 200px; border-radius: 0 0 15px 15px; opacity: 0.8;"></div>
+             <div class="position-relative" style="margin-top: -90px;">
+        {% endif %}
+        {% if profileUser.imageName %}
+            <img src="{{ asset('/uploads/avatars/' ~ profileUser.imageName) }}" class="rounded-circle mb-3 shadow" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid white;" alt="Avatar">
         {% else %}
             <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto mb-3 shadow" style="width: 120px; height: 120px; font-size: 3rem; border: 4px solid white;">👤</div>
         {% endif %}
         
-        <h1 class="h2">{{ user.firstName ? user.firstName ~ ' ' ~ user.lastName : user.email }}</h1>
-        <p class="text-muted mb-3">{{ user.organizationName ?? (user.accountType|capitalize ~ ' Account') }}</p>
+        <h1 class="h2">{{ profileUser.firstName ? profileUser.firstName ~ ' ' ~ profileUser.lastName : profileUser.email }}</h1>
+        <p class="text-muted mb-3">{{ profileUser.organizationName ?? (profileUser.accountType|capitalize ~ ' Account') }}</p>
         
         <a href="{{ path('app_edit_profile') }}" class="btn btn-outline-primary btn-sm rounded-pill px-4">Edit Profile</a>
     </div>
@@ -24,7 +42,7 @@
             </a>
         </div>
 
-        {% if user.animals is empty %}
+        {% if animals is empty %}
             <div class="alert alert-light border text-center py-5">
                 <h4>Your pack is empty! 🕸️</h4>
                 <p>Add your first pet to start building your profile.</p>
@@ -32,7 +50,7 @@
             </div>
         {% else %}
             <div class="row g-4">
-                {% for animal in user.animals %}
+                {% for animal in animals %}
                     <div class="col-md-4 mb-3">
                         <div class="card h-100 shadow-sm hover-shadow transition-all border-0">
                             <!-- Helper to get the right placeholder emoji -->

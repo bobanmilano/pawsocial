@@ -84,6 +84,14 @@
                                                     <button class="dropdown-item text-danger">👑 Make Admin</button>
                                                 </form>
                                             </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form action="{{ path('app_admin_ban_user', {id: user.id}) }}" method="post" onsubmit="return confirm('Are you sure you want to {{ user.isBanned ? 'unban' : 'ban' }} this user?');">
+                                                    <button class="dropdown-item {{ user.isBanned ? 'text-success' : 'text-danger' }}">
+                                                        {{ user.isBanned ? '✅ Unban User' : '🚫 Ban User' }}
+                                                    </button>
+                                                </form>
+                                            </li>
                                         </ul>
                                     </div>
                                 </td>

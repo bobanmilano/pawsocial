@@ -13,8 +13,36 @@
                         <h1 class="card-title mb-4">Edit Your Profile</h1>
 
                         {{ form_start(form) }}
-                            <div class="row">
+                          <div class="row">
+                                {# Cover Image Upload #}
+                                <div class="col-12 mb-4" data-controller="image-preview">
+                                    <label class="form-label fw-bold">Cover Image</label>
+                                    <div class="position-relative mb-2">
+                                        {% if app.user.coverImageName %}
+                                           <img src="{{ asset('/uploads/covers/' ~ app.user.coverImageName) }}" 
+                                                data-image-preview-target="preview" 
+                                                class="img-fluid w-100 rounded shadow-sm" 
+                                                style="height: 200px; object-fit: cover;" 
+                                                alt="Cover Preview">
+                                        {% else %}
+                                            <div class="bg-secondary w-100 rounded d-flex align-items-center justify-content-center text-white" 
+                                                 data-image-preview-target="preview"
+                                                 style="height: 200px;">
+                                                <span>No Cover Image</span>
+                                            </div>
+                                            {# Hidden image tag for preview logic if needed, or just replace the div's content/style via JS? 
+                                               The simplified controller usually targets an <img> src. 
+                                               Let's make sure we have an img tag available even if hidden initially, or use the existing logic check.
+                                            #}
+                                            <img src="#" data-image-preview-target="preview" class="img-fluid w-100 rounded shadow-sm d-none" style="height: 200px; object-fit: cover;" alt="New Cover Preview">
+                                        {% endif %}
+                                    </div>
+                                    {{ form_widget(form.coverImageFile, {'attr': {'data-image-preview-target': 'input', 'data-action': 'change->image-preview#readURL'}}) }}
+                                    {{ form_errors(form.coverImageFile) }}
+                                </div>
+                                
                                 <div class="col-md-4 text-center mb-3" data-controller="image-preview">
+                                    <label class="form-label fw-bold">Profile Picture</label>
                                     {% if app.user.imageName %}
                                         <img src="{{ asset('/uploads/avatars/' ~ app.user.imageName) }}" data-image-preview-target="preview" class="rounded-circle img-fluid mb-2" style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar">
                                     {% else %}
@@ -29,6 +57,7 @@
                                     {{ form_errors(form.imageFile) }}
                                 </div>
                                 <div class="col-md-8">
+                                    <h5 class="mb-3">Personal Details</h5>
                                     <div class="row">
                                         <div class="col-6">{{ form_row(form.firstName) }}</div>
                                         <div class="col-6">{{ form_row(form.lastName) }}</div>

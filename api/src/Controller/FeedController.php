@@ -37,7 +37,8 @@ class FeedController extends AbstractController
 
         // Fetch "Feed" posts: All posts where showInFeed = true, ordered by newest
         // For MVP, we show ALL public posts. Later: Friends only.
-        $feedPosts = $postRepository->findBy(['showInFeed' => true], ['createdAt' => 'DESC'], 50);
+        // Fetch "Feed" posts with eager loading to prevent N+1 queries
+        $feedPosts = $postRepository->findFeedPosts(50);
 
         return $this->render('feed/index.html.twig', [
             'form' => $form,
