@@ -36,7 +36,8 @@
         "symfony/twig-bundle": "7.4.*",
         "symfony/ux-turbo": "^2.31",
         "symfony/validator": "7.4.*",
-        "symfony/yaml": "7.4.*"
+        "symfony/yaml": "7.4.*",
+        "vich/uploader-bundle": "*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.92",

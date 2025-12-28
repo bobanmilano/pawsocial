@@ -1,8 +1,30 @@
 <?php
 
 /**
+ * -------------------------------------------------------------
  * Developed by Boban Milanovic BSc <boban.milanovic@gmail.com>
+ *
+ * Project: PawSocial Social Network
+ * Description: A social network platform designed for pets, animal lovers,
+ * animal shelters, and organizations to connect, share, and collaborate.
+ *
+ * This software is proprietary and confidential. Any use, reproduction, or
+ * distribution without explicit written permission from the author is strictly prohibited.
+ *
+ * For licensing or collaboration inquiries, please contact:
+ * Email: boban.milanovic@gmail.com
+ * -------------------------------------------------------------
+ *
+ * Class: RegistrationFormType
+ * Description: Defines the form structure for user registration.
+ * Responsibilities:
+ * - Builds the registration form.
+ * - Includes fields for email, password, and terms agreement.
+ * - Adds constraints/validation (e.g., password length).
+ * -------------------------------------------------------------
  */
+
+
 
 namespace App\Form;
 
@@ -15,6 +37,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+
 
 class RegistrationFormType extends AbstractType
 {

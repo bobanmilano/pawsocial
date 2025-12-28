@@ -12,7 +12,7 @@ services:
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
       TRUSTED_HOSTS: ^${SERVER_NAME:-localhost|php|caddy}$$
       DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@database:5432/${POSTGRES_DB:-app}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
-      MERCURE_URL: ${CADDY_MERCURE_URL:-http://caddy/.well-known/mercure}
+      MERCURE_URL: ${CADDY_MERCURE_URL:-http://mercure/.well-known/mercure}
       MERCURE_PUBLIC_URL: ${CADDY_MERCURE_PUBLIC_URL:-http://${SERVER_NAME:-localhost}:${HTTP_PORT:-8000}/.well-known/mercure}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
     volumes:
@@ -20,6 +20,8 @@ services:
       - caddy_config:/config
       - ./api:/app
       - ./api/php.ini:/usr/local/etc/php/conf.d/app.ini
+      - php_var:/app/var
+      - php_vendor:/app/vendor
     ports:
       # HTTP
       - target: 80
@@ -85,3 +87,5 @@ volumes:
   meilisearch_data:
   mercure_data:
   mercure_config:
+  php_var:
+  php_vendor:

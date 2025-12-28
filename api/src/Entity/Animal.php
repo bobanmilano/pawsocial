@@ -1,8 +1,31 @@
 <?php
 
 /**
+ * -------------------------------------------------------------
  * Developed by Boban Milanovic BSc <boban.milanovic@gmail.com>
+ *
+ * Project: PawSocial Social Network
+ * Description: A social network platform designed for pets, animal lovers,
+ * animal shelters, and organizations to connect, share, and collaborate.
+ *
+ * This software is proprietary and confidential. Any use, reproduction, or
+ * distribution without explicit written permission from the author is strictly prohibited.
+ *
+ * For licensing or collaboration inquiries, please contact:
+ * Email: boban.milanovic@gmail.com
+ * -------------------------------------------------------------
+ *
+ * Class: Animal
+ * Description: Represents an animal in the Social Network.
+ * Responsibilities:
+ * - Stores animal details (name, species, breed, etc.).
+ * - Links to the owner (User).
+ * - Manages animal profile image.
+ * - Tracks adoptability status.
+ * -------------------------------------------------------------
  */
+
+
 
 namespace App\Entity;
 
@@ -10,9 +33,13 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AnimalRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+
 
 #[ApiResource]
 #[ORM\Entity(repositoryClass: AnimalRepository::class)]
+#[Vich\Uploadable]
 class Animal
 {
     #[ORM\Id]
@@ -40,6 +67,15 @@ class Animal
 
     #[ORM\ManyToOne(inversedBy: 'animals')]
     private ?User $owner = null;
+
+    #[Vich\UploadableField(mapping: 'animal_image', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $imageName = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -128,5 +164,29 @@ class Animal
         $this->owner = $owner;
 
         return $this;
+    }
+
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageName(?string $imageName): void
+    {
+        $this->imageName = $imageName;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
     }
 }

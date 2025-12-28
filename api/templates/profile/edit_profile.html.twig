@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <a href="{{ path('app_my_pack') }}" class="btn btn-link mb-3">&larr; Back to Dashboard</a>
+                
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h1 class="card-title mb-4">Edit Your Profile</h1>
+
+                        {{ form_start(form) }}
+                            <div class="row">
+                                <div class="col-md-4 text-center mb-3">
+                                    {% if app.user.imageName %}
+                                        <img src="{{ asset('/uploads/avatars/' ~ app.user.imageName) }}" class="rounded-circle img-fluid mb-2" style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar">
+                                    {% else %}
+                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 150px; height: 150px; font-size: 3rem;">👤</div>
+                                    {% endif %}
+                                    {{ form_row(form.imageFile) }}
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <div class="col-6">{{ form_row(form.firstName) }}</div>
+                                        <div class="col-6">{{ form_row(form.lastName) }}</div>
+                                    </div>
+                                    {{ form_row(form.organizationName) }}
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,8 +1,30 @@
 <?php
 
 /**
+ * -------------------------------------------------------------
  * Developed by Boban Milanovic BSc <boban.milanovic@gmail.com>
+ *
+ * Project: PawSocial Social Network
+ * Description: A social network platform designed for pets, animal lovers,
+ * animal shelters, and organizations to connect, share, and collaborate.
+ *
+ * This software is proprietary and confidential. Any use, reproduction, or
+ * distribution without explicit written permission from the author is strictly prohibited.
+ *
+ * For licensing or collaboration inquiries, please contact:
+ * Email: boban.milanovic@gmail.com
+ * -------------------------------------------------------------
+ *
+ * Class: SecurityController
+ * Description: Manages user authentication (login/logout).
+ * Responsibilities:
+ * - Handles the login process and displays the login form.
+ * - Manages user logout.
+ * - Provides the logic for authentication errors and last username retrieval.
+ * -------------------------------------------------------------
  */
+
+
 
 namespace App\Controller;
 
@@ -10,6 +32,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+
 
 class SecurityController extends AbstractController
 {

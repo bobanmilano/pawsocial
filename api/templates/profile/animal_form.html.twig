@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <a href="{{ path('app_my_pack') }}" class="btn btn-link mb-3">&larr; Back to Pack</a>
+        
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title mb-4">{{ title }}</h1>
+
+                {{ form_start(form) }}
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.imageFile) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(form.species) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.breed) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(form.gender) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.birthDate) }}
+                        </div>
+                    </div>
+                    
+                    <div class="my-3">
+                        {{ form_row(form.isAdoptable) }}
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Save Profile</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
