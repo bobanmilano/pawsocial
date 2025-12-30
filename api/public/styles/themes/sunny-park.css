@@ -1,0 +1,53 @@
+:root {
+    --primary-color: #FF6B6B;
+    /* Vibrant Coral */
+    --primary-hover: #FF8787;
+    --secondary-color: #4ECDC4;
+    /* Teal/Turquoise */
+    --bg-color: #F7F9F9;
+    /* Cool Lighter Grey */
+    --card-bg-color: #FFFFFF;
+    --text-color: #2D3436;
+    /* Dark Grey */
+    --text-muted: #636E72;
+
+    --border-radius-card: 12px;
+    --border-radius-btn: 50px;
+    /* Pill shaped */
+
+    --box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+    /* Hard shadow, playful */
+
+    --font-family: 'Poppins', sans-serif;
+    /* Geometric, energetic */
+}
+
+body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+    font-family: var(--font-family) !important;
+}
+
+.card {
+    border-radius: var(--border-radius-card) !important;
+    border: 2px solid #000000 !important;
+    /* Comic style border */
+    box-shadow: var(--box-shadow) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: #000000 !important;
+    border-width: 2px !important;
+    color: white !important;
+    border-radius: var(--border-radius-btn) !important;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.navbar {
+    background-color: #FFE66D !important;
+    /* Sunny Yellow */
+    border-bottom: 2px solid #000000;
+}

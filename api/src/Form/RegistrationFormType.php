@@ -33,6 +33,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType; // Add this
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
@@ -54,13 +55,22 @@ class RegistrationFormType extends AbstractType
                 'multiple' => false,
                 'data' => 'private', // Default
             ])
+            ->add('street', \Symfony\Component\Form\Extension\Core\Type\TextType::class, ['required' => false])
+            ->add('houseNumber', \Symfony\Component\Form\Extension\Core\Type\TextType::class, ['required' => false])
+            ->add('zipCode', \Symfony\Component\Form\Extension\Core\Type\TextType::class, ['required' => true])
+            ->add('city', \Symfony\Component\Form\Extension\Core\Type\TextType::class, ['required' => true])
+            ->add('country', \Symfony\Component\Form\Extension\Core\Type\CountryType::class, [
+                'required' => true,
+                'preferred_choices' => ['DE', 'AT', 'CH'],
+                'data' => 'DE'
+            ])
             ->add('email')
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'constraints' => [
-                    new IsTrue([
-                        'message' => 'You should agree to our terms.',
-                    ]),
+                    new IsTrue(
+                        message: 'You should agree to our terms.',
+                    ),
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
@@ -69,9 +79,9 @@ class RegistrationFormType extends AbstractType
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter a password',
-                    ]),
+                    new NotBlank(
+                        message: 'Please enter a password',
+                    ),
                     new Length(
                         min: 6,
                         max: 4096,

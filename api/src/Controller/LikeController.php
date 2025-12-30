@@ -15,9 +15,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class LikeController extends AbstractController
 {
     #[Route('/post/{id}/like', name: 'app_post_like', methods: ['POST'])]
-    public function like(Post $post, PostLikeRepository $likeRepo, EntityManagerInterface $em): JsonResponse
+    public function like(Post $post, PostLikeRepository $likeRepo, EntityManagerInterface $em, \Symfony\Component\HttpFoundation\Request $request): \Symfony\Component\HttpFoundation\Response
     {
+        /** @var \App\Entity\User|null $user */
         $user = $this->getUser();
+
+        if ($this->getParameter('app.csrf_protection_enabled') && !$this->isCsrfTokenValid('like' . $post->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
 
         // check if already liked
         $existingLike = $likeRepo->findOneBy(['post' => $post, 'user' => $user]);
@@ -35,12 +40,12 @@ class LikeController extends AbstractController
             $isLiked = true;
         }
 
-        // Return the new count
-        $count = $likeRepo->count(['post' => $post]);
+        $em->refresh($post);
 
-        return $this->json([
-            'isLiked' => $isLiked,
-            'count' => $count,
+        // Return the new count
+        // For Turbo: Render only the updated post card (containing the frame) to avoid reloading the whole feed.
+        return $this->render('feed/_post_card.html.twig', [
+            'post' => $post,
         ]);
     }
 }

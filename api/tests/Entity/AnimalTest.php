@@ -22,8 +22,8 @@ class AnimalTest extends TestCase
         $animal->setBreed('Golden Retriever');
         $this->assertEquals('Golden Retriever', $animal->getBreed());
 
-        $animal->setOwner($user);
-        $this->assertSame($user, $animal->getOwner());
+        $animal->setUserAccount($user);
+        $this->assertSame($user, $animal->getUserAccount());
 
         $date = new \DateTime('2020-01-01');
         $animal->setBirthDate($date);

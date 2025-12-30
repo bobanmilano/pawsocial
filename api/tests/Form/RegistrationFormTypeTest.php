@@ -25,6 +25,9 @@ class RegistrationFormTypeTest extends TypeTestCase
             'plainPassword' => 'password123',
             'agreeTerms' => true,
             'accountType' => 'private',
+            'zipCode' => '12345',
+            'city' => 'TestCity',
+            'country' => 'DE',
         ];
 
         $model = new User();
@@ -38,6 +41,7 @@ class RegistrationFormTypeTest extends TypeTestCase
         $expected = new User();
         $expected->setEmail('test@example.com');
         $expected->setAccountType('private');
+        $expected->setCountry('DE');
         // agreeTerms also mapped=false usually.
 
         $form->submit($formData);

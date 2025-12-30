@@ -10,8 +10,54 @@
                 
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h1 class="card-title mb-4">Edit Your Profile</h1>
+                        <h1 class="card-title mb-4">Settings</h1>
+                        
+                        {# Theme Switcher #}
+                        <div class="mb-5 p-3 bg-light rounded border">
+                            <h5 class="mb-3">🎨 App Appearance</h5>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="{{ path('app_switch_theme', {theme: 'soft-paw'}) }}" class="btn btn-outline-warning {{ app.session.get('active_theme') == 'soft-paw' ? 'active' : '' }}" data-turbo="false">
+                                    🍦 Soft Paw
+                                </a>
+                                <a href="{{ path('app_switch_theme', {theme: 'sunny-park'}) }}" class="btn btn-outline-danger {{ app.session.get('active_theme') == 'sunny-park' ? 'active' : '' }}" data-turbo="false">
+                                    ☀️ Sunny Park
+                                </a>
+                                <a href="{{ path('app_switch_theme', {theme: 'modern-clay'}) }}" class="btn btn-outline-success {{ app.session.get('active_theme') == 'modern-clay' ? 'active' : '' }}" data-turbo="false">
+                                    🌿 Modern Clay
+                                </a>
+                                <a href="{{ path('app_switch_theme', {theme: 'dark-mode'}) }}" class="btn btn-outline-dark {{ app.session.get('active_theme') == 'dark-mode' ? 'active' : '' }}" data-turbo="false">
+                                    🌑 Dark Mode
+                                </a>
+                                
+                                {# Custom Color Trigger #}
+                                <button class="btn btn-outline-primary {{ app.session.get('active_theme') == 'custom' ? 'active' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#customColorPanel" aria-expanded="false">
+                                    🎨 Custom Colors
+                                </button>
+                            </div>
+                            
+                            {# Custom Color Panel #}
+                            <div class="collapse mt-3 {{ app.session.get('active_theme') == 'custom' ? 'show' : '' }}" id="customColorPanel">
+                                <div class="card card-body border-0 shadow-sm bg-white">
+                                    <form action="{{ path('app_save_custom_colors') }}" method="post" data-turbo="false">
+                                        <div class="row align-items-end">
+                                            <div class="col-md-5 mb-3">
+                                                <label for="primary_color" class="form-label fw-bold">Primary Brand Color</label>
+                                                <input type="color" class="form-control form-control-color w-100" id="primary_color" name="primary_color" value="{{ app.user.primaryColor ?? '#FFB347' }}" title="Choose your color">
+                                            </div>
+                                            <div class="col-md-5 mb-3">
+                                                <label for="secondary_color" class="form-label fw-bold">Accent Color</label>
+                                                <input type="color" class="form-control form-control-color w-100" id="secondary_color" name="secondary_color" value="{{ app.user.secondaryColor ?? '#FFD1DC' }}" title="Choose your color">
+                                            </div>
+                                            <div class="col-md-2 mb-3">
+                                                <button type="submit" class="btn btn-primary w-100 h-100" style="min-height: 38px;">Save</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
 
+                        <h5 class="mb-3">Edit Profile Data</h5>
                         {{ form_start(form) }}
                           <div class="row">
                                 {# Cover Image Upload #}

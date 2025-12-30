@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Post by {{ post.author.firstName }} - Pawsocial{% endblock %}
+
+{% block meta %}
+    <meta property="og:title" content="Post by {{ post.author.firstName ?? 'A Pawsocial User' }}">
+    <meta property="og:description" content="{{ post.content|striptags|slice(0, 200) }}...">
+    {% if post.imageName %}
+        <meta property="og:image" content="{{ absolute_url(asset('/uploads/posts/' ~ post.imageName)) }}">
+    {% endif %}
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ url('app_post_show', {id: post.id}) }}">
+{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="mb-3">
+                <a href="{{ path('app_feed') }}" class="text-decoration-none">← Back to Feed</a>
+            </div>
+            
+            {% include 'feed/_post_card.html.twig' with {post: post} %}
+        </div>
+    </div>
+{% endblock %}

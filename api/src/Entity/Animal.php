@@ -65,8 +65,9 @@ class Animal
     #[ORM\Column]
     private ?bool $isAdoptable = null;
 
-    #[ORM\ManyToOne(inversedBy: 'animals')]
-    private ?User $owner = null;
+    #[ORM\OneToOne(inversedBy: 'animalProfile', targetEntity: User::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $userAccount = null;
 
     #[Vich\UploadableField(mapping: 'animal_image', fileNameProperty: 'imageName')]
     private ?File $imageFile = null;
@@ -154,14 +155,14 @@ class Animal
         return $this;
     }
 
-    public function getOwner(): ?User
+    public function getUserAccount(): ?User
     {
-        return $this->owner;
+        return $this->userAccount;
     }
 
-    public function setOwner(?User $owner): static
+    public function setUserAccount(?User $userAccount): static
     {
-        $this->owner = $owner;
+        $this->userAccount = $userAccount;
 
         return $this;
     }

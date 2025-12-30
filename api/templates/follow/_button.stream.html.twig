@@ -1,0 +1,7 @@
+{# templates/follow/_button.stream.html.twig #}
+
+<turbo-stream action="replace" target="follow_button_user_{{ user.id }}">
+    <template>
+        {% include 'follow/_button.html.twig' with {'user': user} %}
+    </template>
+</turbo-stream>

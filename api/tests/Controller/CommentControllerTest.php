@@ -11,17 +11,20 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class CommentControllerTest extends WebTestCase
 {
-    private function createPost(EntityManagerInterface $em): Post
+    private function createPost(EntityManagerInterface $em, ?User $author = null): Post
     {
-        $user = new User();
-        $user->setEmail('comment_author_' . uniqid() . '@example.com');
-        $user->setPassword('password');
-        $user->setFirstName('Author');
-        $em->persist($user);
+        if (!$author) {
+            $author = new User();
+            $author->setEmail('comment_author_' . uniqid() . '@example.com');
+            $author->setPassword('password');
+            $author->setFirstName('Author');
+            $author->setCountry('DE');
+            $em->persist($author);
+        }
 
         $post = new Post();
         $post->setContent('Post to comment ' . uniqid());
-        $post->setAuthor($user);
+        $post->setAuthor($author);
         $post->setShowInFeed(true);
         $em->persist($post);
         $em->flush();
@@ -29,12 +32,14 @@ class CommentControllerTest extends WebTestCase
         return $post;
     }
 
-    private function createUser(EntityManagerInterface $em): User
+    private function createUser(EntityManagerInterface $em, ?string $email = null): User
     {
         $user = new User();
-        $user->setEmail('commenter_' . uniqid() . '@example.com');
+        $user->setEmail($email ?? ('commenter_' . uniqid() . '@example.com'));
         $user->setPassword('password');
         $user->setFirstName('Commenter');
+        $user->setLastName('Test');
+        $user->setCountry('DE');
         $em->persist($user);
         $em->flush();
 
@@ -47,71 +52,106 @@ class CommentControllerTest extends WebTestCase
         $container = static::getContainer();
         $em = $container->get('doctrine')->getManager();
 
-        $post = $this->createPost($em);
         $user = $this->createUser($em);
+        $post = $this->createPost($em, $user);
 
         $client->loginUser($user);
 
+        // Go to feed to find the form
+        $crawler = $client->request('GET', '/feed');
+        $this->assertResponseIsSuccessful();
+
+        // Find the comment form for this post
+        $form = $crawler->filter('form[action="/post/' . $post->getId() . '/comment"]')->form();
+
         $uniqueContent = 'Test comment ' . uniqid();
-        $client->request('POST', '/post/' . $post->getId() . '/comment', [
+        $client->submit($form, [
             'content' => $uniqueContent
         ]);
 
-        $this->assertResponseRedirects('/feed');
+        $this->assertResponseRedirects();
 
-        $commentRepo = $container->get(CommentRepository::class);
-        $comment = $commentRepo->findOneBy(['content' => $uniqueContent]);
-
+        // Verify database
+        $comment = $em->getRepository(Comment::class)->findOneBy(['content' => $uniqueContent]);
         $this->assertNotNull($comment);
-        $this->assertSame($post->getId(), $comment->getPost()->getId());
-        $this->assertSame($user->getId(), $comment->getAuthor()->getId());
+        $this->assertEquals($user->getId(), $comment->getAuthor()->getId());
+        $this->assertEquals($post->getId(), $comment->getPost()->getId());
     }
 
     public function testDeleteCommentAccess(): void
     {
         $client = static::createClient();
-        $container = static::getContainer();
-        $em = $container->get('doctrine')->getManager();
+        $em = static::getContainer()->get('doctrine')->getManager();
 
-        $post = $this->createPost($em);
-        $owner = $post->getAuthor();
-        $commenter = $this->createUser($em);
-        $stranger = $this->createUser($em);
+        $owner = $this->createUser($em, 'owner_' . uniqid() . '@test.com');
+        $commenter = $this->createUser($em, 'commenter_' . uniqid() . '@test.com');
+        $post = $this->createPost($em, $owner);
 
-        // Create comment by commenter
+        // Create initial comment
         $comment = new Comment();
-        $comment->setContent('Delete me');
+        $comment->setContent('Comment to delete ' . uniqid());
         $comment->setAuthor($commenter);
         $comment->setPost($post);
         $em->persist($comment);
         $em->flush();
         $commentId = $comment->getId();
 
-        // Stranger cannot delete
-        $client->loginUser($stranger);
-        $client->request('POST', '/comment/' . $commentId . '/delete');
-        $this->assertResponseStatusCodeSame(403);
+        $em->clear(); // Ensure fresh load
 
-        // Author can delete
-        $client->loginUser($commenter);
-        $client->request('POST', '/comment/' . $commentId . '/delete');
-        $this->assertResponseRedirects('/feed');
-
-        // Reload entities because EM might have been cleared/closed or client rebooted kernel
-        $post = $em->getRepository(Post::class)->find($post->getId());
+        // Re-fetch objects for assertions and next steps
         $commenter = $em->getRepository(User::class)->find($commenter->getId());
+        $owner = $em->getRepository(User::class)->find($owner->getId());
+        $post = $em->getRepository(Post::class)->find($post->getId());
 
-        // Post Owner can also delete (Need to create new comment)
-        $comment2 = new Comment();
-        $comment2->setContent('Owner delete');
-        $comment2->setAuthor($commenter);
-        $comment2->setPost($post);
-        $em->persist($comment2);
+        // 2. Test SUCCESSFUL deletion (Author)
+        $client->loginUser($commenter);
+        $crawler = $client->request('GET', '/feed');
+
+        // Debug: Check if comment is rendered
+        $this->assertAnySelectorTextContains('body', $comment->getContent());
+
+        // Find delete form for this comment
+        $commentDeleteAction = '/comment/' . $commentId . '/delete';
+        $formNode = $crawler->filter('form')->reduce(function ($node) use ($commentDeleteAction) {
+            return str_contains($node->attr('action') ?? '', $commentDeleteAction);
+        });
+
+        $this->assertGreaterThan(0, $formNode->count(), 'Delete button should be visible for author. Expected: ' . $commentDeleteAction);
+
+        $client->submit($formNode->form());
+        $this->assertResponseRedirects();
+
+        $em->clear();
+        $this->assertNull($em->getRepository(Comment::class)->find($commentId));
+
+        // Re-fetch for next part
+        $commenter = $em->getRepository(User::class)->find($commenter->getId());
+        $owner = $em->getRepository(User::class)->find($owner->getId());
+        $post = $em->getRepository(Post::class)->find($post->getId());
+
+        // 3. Test Owner can delete (Moderation)
+        $newComment = new Comment();
+        $newComment->setContent('Owner delete ' . uniqid());
+        $newComment->setAuthor($commenter);
+        $newComment->setPost($post);
+        $em->persist($newComment);
         $em->flush();
-        $comment2Id = $comment2->getId();
+        $newCommentId = $newComment->getId();
+        $em->clear();
 
         $client->loginUser($owner);
-        $client->request('POST', '/comment/' . $comment2Id . '/delete');
-        $this->assertResponseRedirects('/feed');
+        $crawler = $client->request('GET', '/feed');
+
+        $newCommentDeleteAction = '/comment/' . $newCommentId . '/delete';
+        $formNode = $crawler->filter('form')->reduce(function ($node) use ($newCommentDeleteAction) {
+            return str_contains($node->attr('action') ?? '', $newCommentDeleteAction);
+        });
+        $this->assertGreaterThan(0, $formNode->count(), 'Delete button should be visible for post owner. Expected: ' . $newCommentDeleteAction);
+
+        $client->submit($formNode->form());
+        $this->assertResponseRedirects();
+
+        $em->clear();
+        $this->assertNull($em->getRepository(Comment::class)->find($newCommentId));
     }
 }

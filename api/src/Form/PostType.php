@@ -22,7 +22,7 @@ class PostType extends AbstractType
                 'label' => 'What is your pet up to?',
                 'attr' => ['rows' => 3, 'placeholder' => 'Share a moment...'],
                 'constraints' => [
-                    new Length(['max' => 2000]),
+                    new Length(max: 2000),
                 ],
             ])
             ->add('imageFile', VichImageType::class, [

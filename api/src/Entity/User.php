@@ -68,6 +68,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $lastName = null;
 
+    // --- Address Fields ---
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $street = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $houseNumber = null;
+
+    #[ORM\Column(length: 100, nullable: true)] // Made nullable for existing users, but forms will enforce required
+    private ?string $city = null;
+
+    #[ORM\Column(length: 20, nullable: true)] // Made nullable for existing users
+    private ?string $zipCode = null;
+
+    #[ORM\Column(length: 2, options: ['default' => 'DE'])]
+    private string $country = 'DE';
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $organizationName = null;
 
@@ -79,6 +95,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
 
     /**
      * @var list<string> The user roles
@@ -92,24 +111,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    /** @var Collection<int, Post> */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Post::class, orphanRemoval: true)]
     private Collection $posts;
 
+    /** @var Collection<int, PostLike> */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: PostLike::class, orphanRemoval: true)]
     private Collection $postLikes;
 
-    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Animal::class, orphanRemoval: true)]
-    private Collection $animals;
+    // Animal collection removed. Use managedAccounts to access pets.
 
+    /** @var Collection<int, Comment> */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class, orphanRemoval: true)]
     private Collection $comments;
+
+    // --- Follow System ---
+    /** @var Collection<int, self> */
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'following')]
+    private Collection $followers;
+
+    /** @var Collection<int, self> */
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'followers')]
+    #[ORM\JoinTable(name: 'user_following')]
+    private Collection $following;
+
+    // --- Custom Theme Colors ---
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $website = null;
+
+    #[ORM\Column(length: 7, nullable: true)]
+    private ?string $primaryColor = null;
+
+    #[ORM\Column(length: 7, nullable: true)]
+    private ?string $secondaryColor = null;
+
+    // --- Managed Accounts System ---
+
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'managedAccounts')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?self $managedBy = null;
+
+    /** @var Collection<int, self> */
+    #[ORM\OneToMany(mappedBy: 'managedBy', targetEntity: self::class)]
+    private Collection $managedAccounts;
+
+    #[ORM\OneToOne(mappedBy: 'userAccount', targetEntity: Animal::class, cascade: ['persist', 'remove'])]
+    private ?Animal $animalProfile = null;
 
     public function __construct()
     {
         $this->posts = new ArrayCollection();
-        $this->animals = new ArrayCollection();
+        $this->posts = new ArrayCollection();
+        // $this->animals = new ArrayCollection(); // Removed
         $this->postLikes = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->followers = new ArrayCollection();
+        $this->followers = new ArrayCollection();
+        $this->following = new ArrayCollection();
+        $this->managedAccounts = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
 
@@ -117,6 +177,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -292,34 +364,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Helper to get animals from managed accounts.
      * @return Collection<int, Animal>
      */
     public function getAnimals(): Collection
     {
-        return $this->animals;
-    }
-
-    public function addAnimal(Animal $animal): static
-    {
-        if (!$this->animals->contains($animal)) {
-            $this->animals->add($animal);
-            $animal->setOwner($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAnimal(Animal $animal): static
-    {
-        if ($this->animals->removeElement($animal)) {
-            // set the owning side to null (unless already changed)
-            if ($animal->getOwner() === $this) {
-                $animal->setOwner(null);
+        $animals = new ArrayCollection();
+        foreach ($this->managedAccounts as $account) {
+            if ($account->getAnimalProfile()) {
+                $animals->add($account->getAnimalProfile());
             }
         }
-
-        return $this;
+        return $animals;
     }
+
 
     public function setImageFile(?File $imageFile = null): void
     {
@@ -365,6 +423,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
+
     public function removePost(Post $post): static
     {
         if ($this->posts->removeElement($post)) {
@@ -373,6 +433,233 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $post->setAuthor(null);
             }
         }
+
+        return $this;
+    }
+
+    // --- Address Getters/Setters ---
+
+    public function getStreet(): ?string
+    {
+        return $this->street;
+    }
+
+    public function setStreet(?string $street): static
+    {
+        $this->street = $street;
+        return $this;
+    }
+
+    public function getHouseNumber(): ?string
+    {
+        return $this->houseNumber;
+    }
+
+    public function setHouseNumber(?string $houseNumber): static
+    {
+        $this->houseNumber = $houseNumber;
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(?string $city): static
+    {
+        $this->city = $city;
+        return $this;
+    }
+
+    public function getZipCode(): ?string
+    {
+        return $this->zipCode;
+    }
+
+    public function setZipCode(?string $zipCode): static
+    {
+        $this->zipCode = $zipCode;
+        return $this;
+    }
+
+    public function getCountry(): string
+    {
+        return $this->country;
+    }
+
+    public function setCountry(string $country): static
+    {
+        $this->country = $country;
+        return $this;
+    }
+
+    // --- Follow System Methods ---
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getFollowers(): Collection
+    {
+        return $this->followers;
+    }
+
+    public function addFollower(self $follower): static
+    {
+        if (!$this->followers->contains($follower)) {
+            $this->followers->add($follower);
+            $follower->addFollowing($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollower(self $follower): static
+    {
+        if ($this->followers->removeElement($follower)) {
+            $follower->removeFollowing($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getFollowing(): Collection
+    {
+        return $this->following;
+    }
+
+    public function addFollowing(self $userToFollow): static
+    {
+        if (!$this->following->contains($userToFollow)) {
+            $this->following->add($userToFollow);
+        }
+
+        return $this;
+    }
+
+    public function removeFollowing(self $userToUnfollow): static
+    {
+        $this->following->removeElement($userToUnfollow);
+
+        return $this;
+    }
+
+    public function isFollowing(self $user): bool
+    {
+        return $this->following->contains($user);
+    }
+
+    public function follow(self $user): void
+    {
+        $this->addFollowing($user);
+    }
+
+    public function unfollow(self $user): void
+    {
+        $this->removeFollowing($user);
+    }
+
+    public function getWebsite(): ?string
+    {
+        return $this->website;
+    }
+
+    public function setWebsite(?string $website): static
+    {
+        $this->website = $website;
+
+        return $this;
+    }
+
+    // --- Custom Color Getters/Setters ---
+
+    public function getPrimaryColor(): ?string
+    {
+        return $this->primaryColor;
+    }
+
+    public function setPrimaryColor(?string $primaryColor): static
+    {
+        $this->primaryColor = $primaryColor;
+        return $this;
+    }
+
+    public function getSecondaryColor(): ?string
+    {
+        return $this->secondaryColor;
+    }
+
+    public function setSecondaryColor(?string $secondaryColor): static
+    {
+        $this->secondaryColor = $secondaryColor;
+        return $this;
+    }
+
+    // --- Managed Accounts Methods ---
+
+    public function getManagedBy(): ?self
+    {
+        return $this->managedBy;
+    }
+
+    public function setManagedBy(?self $managedBy): static
+    {
+        $this->managedBy = $managedBy;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getManagedAccounts(): Collection
+    {
+        return $this->managedAccounts;
+    }
+
+    public function addManagedAccount(self $managedAccount): static
+    {
+        if (!$this->managedAccounts->contains($managedAccount)) {
+            $this->managedAccounts->add($managedAccount);
+            $managedAccount->setManagedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeManagedAccount(self $managedAccount): static
+    {
+        if ($this->managedAccounts->removeElement($managedAccount)) {
+            // set the owning side to null (unless already changed)
+            if ($managedAccount->getManagedBy() === $this) {
+                $managedAccount->setManagedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAnimalProfile(): ?Animal
+    {
+        return $this->animalProfile;
+    }
+
+    public function setAnimalProfile(?Animal $animalProfile): static
+    {
+        // unset the owning side of the relationship if necessary
+        if ($animalProfile === null && $this->animalProfile !== null) {
+            $this->animalProfile->setUserAccount(null);
+        }
+
+        // set the owning side of the relationship if necessary
+        if ($animalProfile !== null && $animalProfile->getUserAccount() !== $this) {
+            $animalProfile->setUserAccount($this);
+        }
+
+        $this->animalProfile = $animalProfile;
 
         return $this;
     }

@@ -55,9 +55,11 @@ class LikeControllerTest extends WebTestCase
         // First Like
         $client->request('POST', '/post/' . $post->getId() . '/like');
         $this->assertResponseIsSuccessful();
-        $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertTrue($response['isLiked']);
-        $this->assertEquals(1, $response['count']);
+
+        // Assert Turbo Frame is present and contains the liked state
+        $this->assertSelectorExists('turbo-frame#post_like_section_' . $post->getId());
+        $this->assertSelectorExists('.bi-heart-fill'); // Liked state icon
+        $this->assertSelectorTextContains('turbo-frame#post_like_section_' . $post->getId(), '1');
 
         // Verify DB
         $like = $likeRepo->findOneBy(['post' => $post, 'user' => $user]);
@@ -66,9 +68,9 @@ class LikeControllerTest extends WebTestCase
         // Toggle (Unlike)
         $client->request('POST', '/post/' . $post->getId() . '/like');
         $this->assertResponseIsSuccessful();
-        $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertFalse($response['isLiked']);
-        $this->assertEquals(0, $response['count']);
+
+        $this->assertSelectorExists('.bi-heart'); // Unliked state icon
+        $this->assertSelectorTextContains('turbo-frame#post_like_section_' . $post->getId(), '0');
 
         // Verify DB null
         $em->clear(); // clear cache

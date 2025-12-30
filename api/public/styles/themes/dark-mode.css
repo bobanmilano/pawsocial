@@ -1,0 +1,93 @@
+:root {
+    --primary-color: #BB86FC;
+    /* Purple */
+    --primary-hover: #985EFF;
+    --secondary-color: #03DAC6;
+    /* Teal */
+    --bg-color: #121212;
+    /* Darkest Grey */
+    --card-bg-color: #1E1E1E;
+    /* Dark Grey */
+    --text-color: #E0E0E0;
+    /* Light Grey */
+    --text-muted: #A0A0A0;
+
+    --border-radius-card: 12px;
+    --border-radius-btn: 20px;
+
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+
+    --font-family: system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+    font-family: var(--font-family) !important;
+}
+
+/* Override Bootstrap Text Colors for Dark Mode */
+.text-dark {
+    color: #E0E0E0 !important;
+}
+
+.text-muted {
+    color: #B0B0B0 !important;
+}
+
+.bg-light {
+    background-color: #2C2C2C !important;
+}
+
+.bg-white {
+    background-color: var(--card-bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+.card {
+    background-color: var(--card-bg-color) !important;
+    border: 1px solid #333 !important;
+    border-radius: var(--border-radius-card) !important;
+    box-shadow: var(--box-shadow) !important;
+}
+
+.card-header,
+.card-footer {
+    background-color: var(--card-bg-color) !important;
+    border-color: #333 !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #121212 !important;
+    /* Dark text on bright button */
+    font-weight: 600;
+}
+
+.navbar {
+    background-color: #1F1F1F !important;
+    border-bottom: 1px solid #333;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: #E0E0E0 !important;
+}
+
+.navbar-light .navbar-brand {
+    color: var(--primary-color) !important;
+}
+
+.dropdown-menu {
+    background-color: #2C2C2C !important;
+    border-color: #444;
+}
+
+.dropdown-item {
+    color: #E0E0E0 !important;
+}
+
+.dropdown-item:hover {
+    background-color: #3C3C3C !important;
+    color: white !important;
+}

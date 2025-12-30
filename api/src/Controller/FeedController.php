@@ -24,25 +24,61 @@ class FeedController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var User $user */
+            /** @var User|null $user */
             $user = $this->getUser();
             $post->setAuthor($user);
+
+            // Identity Check
+            $session = $request->getSession();
+            if ($session->get('active_identity_type') === 'animal' && $session->get('active_identity_id')) {
+                // We should technically verify ownership again here for robustness
+                // but checking session id against user's animals is decent.
+                // For optimal perf, we'll just fetch reference if we trust session (which we do for owner check above).
+                // Actually safer: find in user's collection.
+
+                $activeAnimalId = $session->get('active_identity_id');
+                $animals = $user->getAnimals();
+                foreach ($animals as $animal) {
+                    if ((string) $animal->getId() === (string) $activeAnimalId) {
+                        $post->setPostedByAnimal($animal);
+                        break;
+                    }
+                }
+            }
 
             $entityManager->persist($post);
             $entityManager->flush();
 
             $this->addFlash('success', 'Your moment has been shared! 🐾');
+
+            // Turbo Stream Response for immediate update
+            if ($request->getPreferredFormat() === 'turbo-stream' || str_contains($request->headers->get('Accept', ''), 'text/vnd.turbo-stream.html')) {
+                // We need a fresh form
+                $form = $this->createForm(\App\Form\PostType::class, new \App\Entity\Post());
+
+                $response = $this->render('feed/post_created.stream.html.twig', [
+                    'post' => $post,
+                    'form' => $form->createView()
+                ]);
+                $response->headers->set('Content-Type', 'text/vnd.turbo-stream.html');
+                return $response;
+            }
+
             return $this->redirectToRoute('app_feed');
         }
 
         // Fetch "Feed" posts: All posts where showInFeed = true, ordered by newest
         // For MVP, we show ALL public posts. Later: Friends only.
         // Fetch "Feed" posts with eager loading to prevent N+1 queries
-        $feedPosts = $postRepository->findFeedPosts(50);
+        $feedMode = $request->query->get('feed', 'all');
+        /** @var User|null $user */
+        $user = $this->getUser();
+        $feedPosts = $postRepository->findSmartFeedPosts($user, $feedMode, 50);
 
         return $this->render('feed/index.html.twig', [
             'form' => $form,
             'posts' => $feedPosts,
+            'feedMode' => $feedMode
         ]);
     }
 
@@ -57,6 +93,14 @@ class FeedController extends AbstractController
         return $this->render('feed/index.html.twig', [ // Reusing template for now or create specific one
             'posts' => $posts,
             'form' => null // No posting from here for now
+        ]);
+    }
+
+    #[Route('/post/{id}', name: 'app_post_show', requirements: ['id' => '\d+'], priority: 2)]
+    public function show(Post $post): Response
+    {
+        return $this->render('feed/show.html.twig', [
+            'post' => $post,
         ]);
     }
 

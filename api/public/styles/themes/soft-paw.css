@@ -1,0 +1,41 @@
+:root {
+    --primary-color: #FFB347; /* Pastel Orange */
+    --primary-hover: #FFCC80;
+    --secondary-color: #FFD1DC; /* Pastel Pink */
+    --bg-color: #FFF5E6; /* Cream/Soft Peach */
+    --card-bg-color: #FFFFFF;
+    --text-color: #5D4037; /* Warm Brown */
+    --text-muted: #8D6E63;
+    
+    --border-radius-card: 20px;
+    --border-radius-btn: 25px;
+    
+    --box-shadow: 0 10px 25px rgba(255, 179, 71, 0.15);
+    
+    --font-family: 'Nunito', sans-serif; /* Rounded, friendly */
+}
+
+body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+    font-family: var(--font-family) !important;
+}
+
+.card {
+    border-radius: var(--border-radius-card) !important;
+    border: none !important;
+    box-shadow: var(--box-shadow) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: white !important;
+    border-radius: var(--border-radius-btn) !important;
+}
+
+.navbar {
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+    border-bottom: 2px solid var(--secondary-color);
+}

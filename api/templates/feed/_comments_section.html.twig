@@ -1,39 +1,43 @@
-<div class="mt-3 border-top pt-3">
-    <h6>Comments ({{ post.comments|length }})</h6>
+<turbo-frame id="post_comments_section_{{ post.id }}">
+    <div class="mt-3 border-top pt-3">
+        <h6>Comments ({{ post.comments|length }})</h6>
 
-    {# Comment List #}
-    <div class="mb-3">
-        {% for comment in post.comments %}
-            <div class="d-flex mb-2">
-                <img src="{{ comment.author.imageName ? vich_uploader_asset(comment.author, 'imageFile') : asset('images/default-avatar.png') }}"
-                     class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
-                <div class="bg-light rounded p-2 flex-grow-1 position-relative">
-                    <strong>{{ comment.author.firstName }} {{ comment.author.lastName }}</strong>
-                    <small class="text-muted ms-2">{{ comment.createdAt|date('M d, H:i') }}</small>
-                    <p class="mb-0 small">{{ comment.content }}</p>
+        {# Comment List #}
+        <div class="mb-3">
+            {% for comment in post.comments %}
+                <div class="d-flex mb-2">
+                    <img src="{{ comment.author.imageName ? vich_uploader_asset(comment.author, 'imageFile') : asset('images/default-avatar.png') }}"
+                         class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                    <div class="bg-light rounded p-2 flex-grow-1 position-relative">
+                        <strong>{{ comment.author.firstName }} {{ comment.author.lastName }}</strong>
+                        <small class="text-muted ms-2">{{ comment.createdAt|date('M d, H:i') }}</small>
+                        <p class="mb-0 small">{{ comment.content }}</p>
 
-                    {# Delete Button (for author or admin) #}
-                    {% if app.user and (comment.author == app.user or is_granted('ROLE_ADMIN_USER') or post.author == app.user) %}
-                        <form action="{{ path('app_comment_delete', {id: comment.id}) }}" method="post" class="position-absolute top-0 end-0 p-1"
-                              onsubmit="return confirm('Delete this comment?');">
-                            <button type="submit" class="btn btn-sm btn-link text-danger p-0">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </form>
-                    {% endif %}
+                        {# Delete Button (for author or admin) #}
+                        {% if app.user and (comment.author == app.user or is_granted('ROLE_ADMIN_USER') or post.author == app.user) %}
+                            <form action="{{ path('app_comment_delete', {id: comment.id}) }}" method="post" class="position-absolute top-0 end-0 p-1"
+                                  onsubmit="return confirm('Delete this comment?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('comment_delete' ~ comment.id) }}">
+                                <button type="submit" class="btn btn-sm btn-link text-danger p-0">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-        {% else %}
-            <p class="text-muted small">No comments yet. Be the first!</p>
-        {% endfor %}
-    </div>
+            {% else %}
+                <p class="text-muted small">No comments yet. Be the first!</p>
+            {% endfor %}
+        </div>
 
-    {# Add Comment Form #}
-    {% if app.user %}
-        <form action="{{ path('app_post_comment', {id: post.id}) }}" method="post" class="d-flex">
-            <input type="text" name="content" class="form-control form-control-sm me-2" 
-                   placeholder="Write a comment..." required>
-            <button type="submit" class="btn btn-sm btn-primary">Post</button>
-        </form>
-    {% endif %}
-</div>
+        {# Add Comment Form #}
+        {% if app.user %}
+            <form action="{{ path('app_post_comment', {id: post.id}) }}" method="post" class="d-flex">
+                <input type="hidden" name="_token" value="{{ csrf_token('comment_add' ~ post.id) }}">
+                <input type="text" name="content" class="form-control form-control-sm me-2" 
+                       placeholder="Write a comment..." required>
+                <button type="submit" class="btn btn-sm btn-primary">Post</button>
+            </form>
+        {% endif %}
+    </div>
+</turbo-frame>

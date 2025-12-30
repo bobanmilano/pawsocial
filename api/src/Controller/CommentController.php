@@ -18,11 +18,18 @@ class CommentController extends AbstractController
     public function addComment(Post $post, Request $request, EntityManagerInterface $em): Response
     {
         $content = trim($request->request->get('content'));
+        $submittedToken = $request->request->get('_token');
+
+        if ($this->getParameter('app.csrf_protection_enabled') && !$this->isCsrfTokenValid('comment_add' . $post->getId(), $submittedToken)) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
 
         if ($content) {
             $comment = new Comment();
             $comment->setContent($content);
-            $comment->setAuthor($this->getUser());
+            /** @var \App\Entity\User|null $user */
+            $user = $this->getUser();
+            $comment->setAuthor($user);
             $comment->setPost($post);
 
             $em->persist($comment);
@@ -33,11 +40,22 @@ class CommentController extends AbstractController
             $this->addFlash('danger', 'Comment cannot be empty.');
         }
 
+        // Turbo Stream Response
+        // We check loosely for the header because getPreferredFormat() can be finicky with q-values
+        $acceptHeader = $request->headers->get('Accept', '');
+        if (str_contains($acceptHeader, 'text/vnd.turbo-stream.html')) {
+            $response = $this->render('feed/comment_stream.stream.html.twig', [
+                'post' => $post,
+            ]);
+            $response->headers->set('Content-Type', 'text/vnd.turbo-stream.html');
+            return $response;
+        }
+
         return $this->redirectToRoute('app_feed');
     }
 
     #[Route('/comment/{id}/delete', name: 'app_comment_delete', methods: ['POST'])]
-    public function deleteComment(Comment $comment, EntityManagerInterface $em): Response
+    public function deleteComment(Comment $comment, EntityManagerInterface $em, Request $request): Response
     {
         // Allow deletion if user is author OR admin OR post owner
         $user = $this->getUser();
@@ -50,10 +68,24 @@ class CommentController extends AbstractController
             throw $this->createAccessDeniedException('You cannot delete this comment.');
         }
 
+        if ($this->getParameter('app.csrf_protection_enabled') && !$this->isCsrfTokenValid('comment_delete' . $comment->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
         $em->remove($comment);
         $em->flush();
 
         $this->addFlash('success', 'Comment deleted.');
+
+        // Turbo Stream Response
+        $acceptHeader = $request->headers->get('Accept', '');
+        if (str_contains($acceptHeader, 'text/vnd.turbo-stream.html')) {
+            $response = $this->render('feed/comment_stream.stream.html.twig', [
+                'post' => $comment->getPost(),
+            ]);
+            $response->headers->set('Content-Type', 'text/vnd.turbo-stream.html');
+            return $response;
+        }
 
         return $this->redirectToRoute('app_feed');
     }

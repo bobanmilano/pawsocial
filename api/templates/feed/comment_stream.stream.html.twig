@@ -1,0 +1,18 @@
+{# templates/feed/comment_stream.stream.html.twig #}
+
+{# 1. Update the comments list (inside the turbo-frame) #}
+<turbo-stream action="replace" target="post_comments_section_{{ post.id }}">
+    <template>
+        {% include 'feed/_comments_section.html.twig' %}
+    </template>
+</turbo-stream>
+
+{# 2. Update the comment count (outside the turbo-frame, in the card footer) #}
+<turbo-stream action="update" target="post_comment_count_{{ post.id }}">
+    <template>
+        {{ post.comments|length }}
+    </template>
+</turbo-stream>
+
+{# 3. Show a flash message (optional, handled via global flash stream usually, but can be done here) #}
+{# For now we rely on the comment appearing as sufficient feedback #}

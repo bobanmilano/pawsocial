@@ -29,87 +29,141 @@
         {% endif %}
         
         <h1 class="h2">{{ profileUser.firstName ? profileUser.firstName ~ ' ' ~ profileUser.lastName : profileUser.email }}</h1>
-        <p class="text-muted mb-3">{{ profileUser.organizationName ?? (profileUser.accountType|capitalize ~ ' Account') }}</p>
+        <p class="text-muted mb-2">{{ profileUser.organizationName ?? (profileUser.accountType|capitalize ~ ' Account') }}</p>
+
+        <!-- Follow Button Area -->
+        <div class="mb-3">
+             {% include 'follow/_button.html.twig' with {'user': profileUser} %}
+        </div>
         
-        <a href="{{ path('app_edit_profile') }}" class="btn btn-outline-primary btn-sm rounded-pill px-4">Edit Profile</a>
+        {% if app.user == profileUser %}
+            <a href="{{ path('app_edit_profile') }}" class="btn btn-outline-primary btn-sm rounded-pill px-4">Edit Profile</a>
+        {% endif %}
     </div>
 
-    <div class="pack-section">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="h4 border-start border-4 border-primary ps-3">Your Pack 🐾</h2>
-            <a href="{{ path('app_add_animal') }}" class="btn btn-primary rounded-pill">
-                + Add Member
-            </a>
+    {# 2. Pets Section (Horizontal Row) #}
+    <div class="container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold">My Pets 🐾</h4>
+            {% if app.user == profileUser %}
+                <a href="{{ path('app_add_animal') }}" class="btn btn-sm btn-outline-primary rounded-pill">
+                    + Add Pet
+                </a>
+            {% endif %}
         </div>
 
         {% if animals is empty %}
-            <div class="alert alert-light border text-center py-5">
-                <h4>Your pack is empty! 🕸️</h4>
-                <p>Add your first pet to start building your profile.</p>
-                <a href="{{ path('app_add_animal') }}" class="btn btn-success mt-2">Add Pet</a>
+            <div class="alert alert-light border text-center py-4">
+                <p class="mb-2">No pets added yet.</p>
+                {% if app.user == profileUser %}
+                    <a href="{{ path('app_add_animal') }}" class="btn btn-sm btn-primary">Add Pet</a>
+                {% endif %}
             </div>
         {% else %}
-            <div class="row g-4">
+            {# Horizontal Scrollable Row for Pets #}
+            <div class="d-flex overflow-auto pb-3 gap-3" style="scrollbar-width: thin;">
                 {% for animal in animals %}
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 shadow-sm hover-shadow transition-all border-0">
-                            <!-- Helper to get the right placeholder emoji -->
-                            {% set emoji = animal.species == 'dog' ? '🐶' : (animal.species == 'cat' ? '🐱' : '🐾') %}
-                            
+                    <div class="card shadow-sm border-0 flex-shrink-0" style="width: 280px;">
+                        {% set emoji = animal.species == 'dog' ? '🐶' : (animal.species == 'cat' ? '🐱' : '🐾') %}
+                        
+                        <div class="position-relative">
                             {% if animal.imageName %}
-                                <img src="{{ asset('/uploads/animals/' ~ animal.imageName) }}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="{{ animal.name }}">
+                                <img src="{{ asset('/uploads/animals/' ~ animal.imageName) }}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="{{ animal.name }}">
                             {% else %}
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted" style="height: 250px; font-size: 4rem;">
+                                <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 180px; font-size: 3rem;">
                                     {{ emoji }}
                                 </div>
                             {% endif %}
                             
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <h5 class="card-title fw-bold">{{ animal.name }}</h5>
-                                    {% if animal.gender %}
-                                        <span class="badge bg-light text-dark border">{{ animal.gender|capitalize }}</span>
-                                    {% endif %}
-                                </div>
-                                <p class="card-text text-muted small mb-2">
-                                    {{ animal.species|capitalize }} • {{ animal.breed ?? 'Unknown Breed' }}
-                                </p>
-                                <p class="small">
-                                    {% if animal.birthDate %}
-                                        {{ animal.birthDate|date('Y') }} ({{ "now"|date('Y') - animal.birthDate|date('Y') }}y)
-                                    {% else %}
-                                        Age Unknown
-                                    {% endif %}
-                                </p>
-                                {% if animal.isAdoptable %}
-                                    <div class="badge bg-success w-100 py-2">✨ Up for Adoption</div>
-                                {% endif %}
+                            {% if animal.isAdoptable %}
+                                <div class="position-absolute top-0 end-0 m-2 badge bg-success shadow-sm">Adopt Me</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <h5 class="card-title fw-bold mb-0">{{ animal.name }}</h5>
+                                <small class="text-muted">{{ animal.gender|capitalize }}</small>
                             </div>
-                            <div class="card-footer bg-transparent border-top-0 pt-0 pb-3">
-                                <a href="{{ path('app_edit_animal', {id: animal.id}) }}" class="btn btn-outline-secondary w-100 btn-sm">Manage Profile</a>
-                            </div>
+                            <p class="card-text small text-muted mb-2">
+                                {{ animal.species|capitalize }} • {{ animal.breed ?? 'Unknown' }}
+                            </p>
+                            
+                            {% if app.user == profileUser %}
+                                <a href="{{ path('app_edit_animal', {id: animal.id}) }}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Manage</a>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
     </div>
-    <div class="posts-section mt-5">
-        <h2 class="h4 border-start border-4 border-info ps-3 mb-4">Your Moments 📸</h2>
 
-        {% if posts is empty %}
-            <div class="text-center text-muted py-5">
-                <p>You haven't posted any moments yet.</p>
-                <a href="{{ path('app_feed') }}" class="btn btn-outline-primary btn-sm rounded-pill">Share a moment</a>
-            </div>
-        {% else %}
-            <div class="row">
-                <div class="col-md-8 mx-auto">
-                    {% for post in posts|sort((a, b) => b.createdAt <=> a.createdAt) %}
-                        {% include 'feed/_post_card.html.twig' with {'post': post} %}
-                    {% endfor %}
+    {# 3. Main Content & Sidebar (2/3 + 1/3) #}
+    <div class="row">
+        {# Left Column: Main Stream (2/3) #}
+        <div class="col-lg-8">
+            {% if posts is empty %}
+                <div class="text-center text-muted py-5 border rounded bg-light">
+                    <p>No moments shared yet.</p>
+                    {% if app.user == profileUser %}
+                        <a href="{{ path('app_feed') }}" class="btn btn-outline-primary btn-sm rounded-pill">Share a moment</a>
+                    {% endif %}
+                </div>
+            {% else %}
+                {% for post in posts|sort((a, b) => b.createdAt <=> a.createdAt) %}
+                    {% include 'feed/_post_card.html.twig' with {'post': post} %}
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        {# Right Column: Sidebar (1/3) #}
+        <div class="col-lg-4">
+            {# Personal Cards / Info Section #}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">About</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="bi bi-geo-alt me-2 text-muted"></i> {{ profileUser.location ?? 'Unknown Location' }}</li>
+                        <li class="mb-2"><i class="bi bi-calendar3 me-2 text-muted"></i> Joined {{ profileUser.createdAt|date('M Y') }}</li>
+                        {% if profileUser.website %}
+                             <li class="mb-2"><i class="bi bi-link-45deg me-2 text-muted"></i> <a href="{{ profileUser.website }}" target="_blank" class="text-decoration-none">{{ profileUser.website }}</a></li>
+                        {% endif %}
+                    </ul>
                 </div>
             </div>
-        {% endif %}
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">Pack Members</h5>
+                     {# Followers / Friends Placeholder #}
+                     <div class="d-flex flex-wrap gap-2">
+                         {% for follower in profileUser.followers|slice(0, 6) %}
+                             <a href="#" title="{{ follower.firstName }}" class="text-decoration-none">
+                                {# Avatar logic would go here #}
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px;">
+                                    {{ follower.firstName|slice(0,1) }}
+                                </div>
+                             </a>
+                         {% else %}
+                            <p class="text-muted small">No followers yet.</p>
+                         {% endfor %}
+                     </div>
+                </div>
+            </div>
+            
+            {# Photos / Media Placeholder #}
+             <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">Photos</h5>
+                    <div class="row g-1">
+                        {# Just a placeholder grid #}
+                        <div class="col-4"><div class="bg-light ratio ratio-1x1 rounded"></div></div>
+                        <div class="col-4"><div class="bg-light ratio ratio-1x1 rounded"></div></div>
+                        <div class="col-4"><div class="bg-light ratio ratio-1x1 rounded"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

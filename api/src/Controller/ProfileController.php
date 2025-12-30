@@ -96,15 +96,40 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/add-animal', name: 'app_add_animal')]
-    public function addAnimal(Request $request, EntityManagerInterface $entityManager): Response
+    public function addAnimal(Request $request, EntityManagerInterface $entityManager, \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $userPasswordHasher): Response
     {
         $animal = new Animal();
-        $animal->setOwner($this->getUser());
+        // We do NOT set owner directly anymore. We need to create a User account for this animal.
 
         $form = $this->createForm(AnimalType::class, $animal);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Create the Pet Account (User)
+            $petUser = new User();
+            $petUser->setFirstName($animal->getName()); // Use animal name as First Name
+            // Generate a unique email
+            $petUser->setEmail('pet_' . uniqid() . '@pawsocial.internal');
+            $petUser->setRoles(['ROLE_PET']);
+            $petUser->setAccountType('pet');
+            $currentUser = $this->getUser();
+            if (!$currentUser instanceof User) {
+                throw new \LogicException('User must be logged in.');
+            }
+            $petUser->setManagedBy($currentUser);
+
+            // Dummy password (required)
+            $petUser->setPassword(
+                $userPasswordHasher->hashPassword(
+                    $petUser,
+                    'pet_password_' . uniqid() // Random password, owner switches in
+                )
+            );
+
+            // Link Animal Profile to Pet User
+            $animal->setUserAccount($petUser);
+
+            $entityManager->persist($petUser);
             $entityManager->persist($animal);
             $entityManager->flush();
 
@@ -122,9 +147,13 @@ class ProfileController extends AbstractController
     #[Route('/animal/{id}/edit', name: 'app_edit_animal')]
     public function editAnimal(Request $request, Animal $animal, EntityManagerInterface $entityManager): Response
     {
-        // Security check: Owner only
-        if ($animal->getOwner() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+        // Security check: ManagedBy check
+        $petUser = $animal->getUserAccount();
+        if (!$petUser || $petUser->getManagedBy() !== $this->getUser()) {
+            // Allow if self (if logged in as pet)
+            if ($this->getUser() !== $petUser) {
+                throw $this->createAccessDeniedException();
+            }
         }
 
         $form = $this->createForm(AnimalType::class, $animal);
@@ -141,6 +170,15 @@ class ProfileController extends AbstractController
         return $this->render('profile/animal_form.html.twig', [
             'form' => $form,
             'title' => 'Edit ' . $animal->getName()
+        ]);
+    }
+    #[Route('/profile/{id}', name: 'app_user_profile')]
+    public function show(User $user, \App\Repository\PostRepository $postRepository): Response
+    {
+        return $this->render('profile/my_pack.html.twig', [
+            'profileUser' => $user, // Use the requested user, not current user
+            'animals' => $user->getAnimals(),
+            'posts' => $postRepository->findProfilePosts($user),
         ]);
     }
 }

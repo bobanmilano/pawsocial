@@ -27,6 +27,8 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
+use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -40,7 +42,19 @@ class UserProfileType extends AbstractType
         $builder
             ->add('firstName', TextType::class, ['required' => false])
             ->add('lastName', TextType::class, ['required' => false])
-            ->add('organizationName', TextType::class, ['required' => false, 'label' => 'Organization (Optional)'])
+            ->add('street', TextType::class, ['required' => false])
+            ->add('houseNumber', TextType::class, ['required' => false])
+            ->add('zipCode', TextType::class, ['required' => true])
+            ->add('city', TextType::class, ['required' => true])
+            ->add('country', \Symfony\Component\Form\Extension\Core\Type\CountryType::class, [
+                'required' => true,
+                'preferred_choices' => ['DE', 'AT', 'CH'],
+            ])
+            ->add('organizationName', TextType::class, [
+                'required' => false,
+                'label' => 'Organization Name (Optional)',
+                'attr' => ['class' => 'form-control'],
+            ])
             ->add('imageFile', VichImageType::class, [
                 'required' => false,
                 'allow_delete' => true,

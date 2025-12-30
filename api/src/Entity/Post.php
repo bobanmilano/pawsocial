@@ -26,6 +26,10 @@ class Post
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Animal $postedByAnimal = null;
+
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
@@ -47,9 +51,11 @@ class Post
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /** @var Collection<int, PostLike> */
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostLike::class, orphanRemoval: true)]
     private Collection $postLikes;
 
+    /** @var Collection<int, Comment> */
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: Comment::class, orphanRemoval: true)]
     private Collection $comments;
 
@@ -73,6 +79,18 @@ class Post
     public function setAuthor(?User $author): static
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getPostedByAnimal(): ?Animal
+    {
+        return $this->postedByAnimal;
+    }
+
+    public function setPostedByAnimal(?Animal $postedByAnimal): static
+    {
+        $this->postedByAnimal = $postedByAnimal;
 
         return $this;
     }
@@ -175,7 +193,7 @@ class Post
 
         // Simple regex for YouTube ID
         // Supports: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID
-        if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $this->videoUrl, $matches)) {
+        if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|shorts\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $this->videoUrl, $matches)) {
             return $matches[1];
         }
 

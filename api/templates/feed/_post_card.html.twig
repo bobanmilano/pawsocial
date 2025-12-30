@@ -1,17 +1,45 @@
-<div class="card shadow-sm mb-4 border-0">
+<div class="card shadow-sm mb-4 border-0" id="post-{{ post.id }}">
     <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3 pb-0">
-        <div class="d-flex align-items-center">
-            {% if post.author.imageName %}
-                <img src="{{ asset('/uploads/avatars/' ~ post.author.imageName) }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
-            {% else %}
-                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">👤</div>
-            {% endif %}
-            <div>
-                <h6 class="mb-0 fw-bold">{{ post.author.firstName ?? post.author.email }}</h6>
-                <small class="text-muted">{{ post.createdAt|date('M j, Y • H:i') }}</small>
-                {% if not post.showInFeed %}
-                    <span class="badge bg-secondary ms-2" title="Visible only on profile">🔒 Profile Only</span>
+        <div class="d-flex align-items-center mb-3">
+            {# Avatar Selection #}
+            {% if post.postedByAnimal %}
+                {% if post.postedByAnimal.imageName %}
+                     <img src="{{ asset('/uploads/animals/' ~ post.postedByAnimal.imageName) }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;" alt="{{ post.postedByAnimal.name }}">
+                {% else %}
+                     {% set emoji = post.postedByAnimal.species == 'dog' ? '🐶' : (post.postedByAnimal.species == 'cat' ? '🐱' : '🐾') %}
+                     <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">{{ emoji }}</div>
                 {% endif %}
+            {% else %}
+                {# User Avatar #}
+                {% if post.author.imageName %}
+                    <img src="{{ asset('/uploads/avatars/' ~ post.author.imageName) }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;" alt="{{ post.author.firstName }}">
+                {% else %}
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">👤</div>
+                {% endif %}
+            {% endif %}
+            
+            <div class="lh-sm">
+                {% if post.postedByAnimal %}
+                    <!-- Posted by Animal -->
+                    <h6 class="mb-0 fw-bold">
+                         <a href="{{ path('app_user_profile', {id: post.author.id}) }}" class="text-decoration-none text-dark">
+                            {{ post.postedByAnimal.name }} 🐾
+                         </a>
+                    </h6>
+                    <small class="text-muted" style="font-size: 0.85rem;">via {{ post.author.firstName }}</small>
+                {% else %}
+                    <!-- Posted by User -->
+                    <h6 class="mb-0 fw-bold">
+                        <a href="{{ path('app_user_profile', {id: post.author.id}) }}" class="text-decoration-none text-dark">
+                            {{ post.author.firstName }} {{ post.author.lastName }}
+                        </a>
+                    </h6>
+                {% endif %}
+                <div class="text-muted small">{{ post.createdAt|date('M d, Y • H:i') }}
+                    {% if not post.showInFeed %}
+                        <span class="badge bg-secondary ms-1" style="font-size: 0.7em;">🔒 Profile Only</span>
+                    {% endif %}
+                </div>
             </div>
         </div>
         
@@ -37,26 +65,27 @@
         </div>
     </div>
 
-    <div class="card-body">
-        <p class="card-text fs-5">{{ post.content|nl2br }}</p>
-    </div>
-
-    {% if post.imageName %}
-        <img src="{{ asset('/uploads/posts/' ~ post.imageName) }}" class="card-img-bottom" alt="Post Image">
-    {% elseif post.videoUrl %}
+    <div class="card-body bg-white">
+        <p class="card-text mb-3" style="white-space: pre-wrap;">{{ post.content }}</p>
+        
+        {% if post.imageName %}
+            <div class="mb-3 rounded overflow-hidden shadow-sm">
+                <img src="{{ asset('/uploads/posts/' ~ post.imageName) }}" class="img-fluid w-100" alt="Post Image">
+            </div>
+        {% endif %}
         {% set videoId = post.videoId %}
         {% if videoId %}
             <div class="ratio ratio-16x9">
                 <iframe src="https://www.youtube.com/embed/{{ videoId }}" title="YouTube video" allowfullscreen></iframe>
             </div>
         {% endif %}
-    {% endif %}
+    </div>
 
     <div class="card-footer bg-white">
         <div class="d-flex justify-content-between align-items-center">
             
             {# Turbo Frame for Like Button #}
-            <turbo-frame id="post_like_{{ post.id }}">
+            <turbo-frame id="post_like_section_{{ post.id }}">
                 {% set isLiked = false %}
                 {% if app.user %}
                     {% for like in post.postLikes %}
@@ -66,8 +95,8 @@
                     {% endfor %}
                 {% endif %}
 
-                <form action="{{ path('app_post_like', {id: post.id}) }}" method="post" 
-                      data-turbo-frame="post_like_{{ post.id }}" class="d-inline">
+                <form action="{{ path('app_post_like', {id: post.id}) }}" method="post" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('like' ~ post.id) }}">
                     <button type="submit" class="btn btn-link text-decoration-none p-0 me-3 {{ isLiked ? 'text-danger' : 'text-muted' }}">
                         <i class="bi {{ isLiked ? 'bi-heart-fill' : 'bi-heart' }}"></i>
                         <span>{{ post.postLikes|length }}</span>
@@ -78,11 +107,16 @@
             {# Comment Toggle / Count #}
             <button class="btn btn-link text-decoration-none text-muted p-0" 
                     type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.id }}">
-                <i class="bi bi-chat"></i> {{ post.comments|length }} Comments
+                <i class="bi bi-chat"></i> <span id="post_comment_count_{{ post.id }}">{{ post.comments|length }}</span> Comments
             </button>
             
-            {# Share Button (Dummy) #}
-            <button class="btn btn-link text-decoration-none text-muted p-0">
+            {# Share Button #}
+            <button class="btn btn-link text-decoration-none text-muted p-0"
+                    data-controller="share"
+                    data-share-title-value="Post by {{ post.author.firstName }}"
+                    data-share-text-value="{{ post.content|striptags|slice(0, 100) }}..."
+                    data-share-url-value="{{ url('app_post_show', {id: post.id}) }}"
+                    data-action="click->share#share">
                 <i class="bi bi-share"></i> Share
             </button>
         </div>

@@ -1,0 +1,48 @@
+:root {
+    --primary-color: #A0522D;
+    /* Sienna / Terracotta */
+    --primary-hover: #8B4513;
+    --secondary-color: #8FBC8F;
+    /* Dark Sea Green */
+    --bg-color: #F0EAD6;
+    /* Eggshell */
+    --card-bg-color: #FDFBF7;
+    --text-color: #3E2723;
+    /* Dark Brown */
+    --text-muted: #795548;
+
+    --border-radius-card: 8px;
+    /* Subtle rounding */
+    --border-radius-btn: 8px;
+
+    --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    --font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+    font-family: var(--font-family) !important;
+}
+
+.card {
+    border-radius: var(--border-radius-card) !important;
+    border: none !important;
+    box-shadow: var(--box-shadow) !important;
+    background-color: var(--card-bg-color) !important;
+}
+
+.btn-primary {
+    background-color: var(--secondary-color) !important;
+    /* Green buttons */
+    border-color: var(--secondary-color) !important;
+    color: white !important;
+    border-radius: var(--border-radius-btn) !important;
+}
+
+.navbar {
+    background-color: #FFFFFF !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}

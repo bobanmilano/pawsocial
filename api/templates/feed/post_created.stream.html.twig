@@ -1,0 +1,13 @@
+{# templates/feed/post_created.stream.html.twig #}
+<turbo-stream action="prepend" target="feed-stream">
+    <template>
+        {% include 'feed/_post_card.html.twig' with {'post': post} %}
+    </template>
+</turbo-stream>
+
+<turbo-stream action="replace" target="new_post_form">
+    <template>
+        {# Re-render the form cleanly #}
+        {% include 'feed/_form.html.twig' with {'form': form} %}
+    </template>
+</turbo-stream>
