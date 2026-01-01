@@ -57,9 +57,9 @@ class LikeControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         // Assert Turbo Frame is present and contains the liked state
-        $this->assertSelectorExists('turbo-frame#post_like_section_' . $post->getId());
+        $this->assertSelectorExists('turbo-frame#like_post_' . $post->getId());
         $this->assertSelectorExists('.bi-heart-fill'); // Liked state icon
-        $this->assertSelectorTextContains('turbo-frame#post_like_section_' . $post->getId(), '1');
+        $this->assertSelectorTextContains('turbo-frame#like_post_' . $post->getId(), '1');
 
         // Verify DB
         $like = $likeRepo->findOneBy(['post' => $post, 'user' => $user]);
@@ -70,7 +70,7 @@ class LikeControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertSelectorExists('.bi-heart'); // Unliked state icon
-        $this->assertSelectorTextContains('turbo-frame#post_like_section_' . $post->getId(), '0');
+        $this->assertSelectorTextContains('turbo-frame#like_post_' . $post->getId(), '0');
 
         // Verify DB null
         $em->clear(); // clear cache

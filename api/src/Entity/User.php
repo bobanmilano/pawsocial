@@ -38,7 +38,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
 
 #[ApiResource]
@@ -145,6 +145,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 7, nullable: true)]
     private ?string $secondaryColor = null;
 
+    #[ORM\Column(length: 5, options: ['default' => 'en'])]
+    private string $locale = 'en';
+
     // --- Managed Accounts System ---
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'managedAccounts')]
@@ -161,11 +164,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->posts = new ArrayCollection();
-        $this->posts = new ArrayCollection();
         // $this->animals = new ArrayCollection(); // Removed
         $this->postLikes = new ArrayCollection();
         $this->comments = new ArrayCollection();
-        $this->followers = new ArrayCollection();
         $this->followers = new ArrayCollection();
         $this->following = new ArrayCollection();
         $this->managedAccounts = new ArrayCollection();
@@ -598,6 +599,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(string $locale): static
+    {
+        $this->locale = $locale;
+        return $this;
+    }
+
     // --- Managed Accounts Methods ---
 
     public function getManagedBy(): ?self
@@ -662,5 +674,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->animalProfile = $animalProfile;
 
         return $this;
+    }
+
+    public function isManagedBy(self $user): bool
+    {
+        return $this->managedBy !== null && $this->managedBy->getId() === $user->getId();
     }
 }

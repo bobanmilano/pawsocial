@@ -3,25 +3,67 @@
 {% block title %}Register{% endblock %}
 
 {% block body %}
-    <div class="card">
-        <h1>Register for Pawsocial</h1>
+    <div class="row justify-content-center pt-5">
+        <div class="col-md-6 col-lg-5">
+            <div class="text-center mb-5 animate-fade-in">
+                 <img src="{{ asset('images/logo-paw-rb.png') }}" alt="Pawsocial" height="80" class="mb-3">
+                 <h2 class="fw-bold">Join the Pack!</h2>
+                 <p class="text-muted">Create an account and start sharing moments 🐾</p>
+            </div>
 
-        {{ form_errors(registrationForm) }}
+            <div class="card glass-card border-0 shadow-lg animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="card-body p-4 p-md-5">
+                    {{ form_errors(registrationForm) }}
 
-        {{ form_start(registrationForm) }}
-            {{ form_row(registrationForm.email, {
-                'attr': {'class': 'form-control'}
-            }) }}
-            {{ form_row(registrationForm.plainPassword, {
-                'label': 'Password'
-            }) }}
-            {{ form_row(registrationForm.agreeTerms) }}
+                    {{ form_start(registrationForm) }}
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.email, 'Email Address', {'label_attr': {'class': 'form-label small fw-bold text-muted text-uppercase'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text border-0 bg-light rounded-start-4"><i class="bi bi-envelope text-muted"></i></span>
+                                {{ form_widget(registrationForm.email, {
+                                    'attr': {
+                                        'class': 'form-control border-0 bg-light rounded-end-4 p-3',
+                                        'placeholder': 'name@example.com'
+                                    }
+                                }) }}
+                            </div>
+                        </div>
 
-            <button type="submit" class="btn">Register</button>
-        {{ form_end(registrationForm) }}
-        
-        <p style="margin-top: 20px;">
-            Already have an account? <a href="{{ path('app_login') }}">Log in</a>
-        </p>
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'form-label small fw-bold text-muted text-uppercase'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text border-0 bg-light rounded-start-4"><i class="bi bi-lock text-muted"></i></span>
+                                {{ form_widget(registrationForm.plainPassword, {
+                                    'attr': {
+                                        'class': 'form-control border-0 bg-light rounded-end-4 p-3',
+                                        'placeholder': '••••••••'
+                                    }
+                                }) }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4 pt-2">
+                            <div class="form-check custom-check">
+                                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                                {{ form_label(registrationForm.agreeTerms, 'I agree to the pack rules and terms', {'label_attr': {'class': 'form-check-label small fw-semibold text-muted'}}) }}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-premium btn-lg w-100 shadow-lg py-3 mb-4">
+                            Create Account 🐾
+                        </button>
+                    {{ form_end(registrationForm) }}
+                    
+                    <div class="text-center">
+                        <span class="text-muted small">Part of the pack already?</span> 
+                        <a href="{{ path('app_login') }}" class="small fw-bold text-decoration-none ms-1">Sign in here</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5 animate-fade-in" style="animation-delay: 0.2s;">
+                 <p class="small text-muted mb-0">By joining, you agree to treat all pets with respect.</p>
+            </div>
+        </div>
     </div>
 {% endblock %}

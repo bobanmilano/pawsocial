@@ -1,0 +1,8 @@
+herd:
+    title: "Mijn kudde"
+    header: "De kudde van %name%"
+    member: "Lid van de kudde"
+    protector: "Kuddebeschermer"
+    empty: "Nog geen leden in deze kudde"
+    add_pet: "Nieuw kuddemid"
+    nav: "🐕 Mijn kudde"

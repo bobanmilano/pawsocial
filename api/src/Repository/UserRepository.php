@@ -58,6 +58,22 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * @return User[]
+     */
+    public function searchUsersAndPets(string $query): array
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.animalProfile', 'a')
+            ->addSelect('a')
+            ->andWhere('u.firstName LIKE :query OR u.lastName LIKE :query OR u.email LIKE :query OR a.name LIKE :query OR a.breed LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('u.firstName', 'ASC')
+            ->setMaxResults(50)
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     // * @return User[] Returns an array of User objects
     // */

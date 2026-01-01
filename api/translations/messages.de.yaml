@@ -1,0 +1,9 @@
+herd:
+    title: "Meine Herde"
+    header: "%name%s Herde"
+    member: "Mitglied der Herde"
+    protector: "Herdenhüter"
+    empty: "Noch keine Mitglieder in dieser Herde"
+    add_pet: "Neues Herdenmitglied"
+    leader: "Familienoberhaupt" # Fallback/Alternative or keep as "Herdenhüter"
+    nav: "🐕 Meine Herde"

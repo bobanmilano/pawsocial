@@ -1,0 +1,8 @@
+herd:
+    title: "Moje stado"
+    header: "Stado użytkownika %name%"
+    member: "Członek stada"
+    protector: "Opiekun stada"
+    empty: "W tym stadzie nie ma jeszcze żadnych członków"
+    add_pet: "Nowy członek stada"
+    nav: "🐕 Moje stado"

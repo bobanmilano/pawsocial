@@ -21,6 +21,7 @@ class UserProfileTypeTest extends KernelTestCase
             'zipCode' => '12345',
             'city' => 'TestCity',
             'country' => 'DE',
+            'locale' => 'en',
         ];
 
         $model = new User();

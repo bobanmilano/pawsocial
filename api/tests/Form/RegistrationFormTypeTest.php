@@ -9,6 +9,8 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Validator\Validation;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+
 class RegistrationFormTypeTest extends TypeTestCase
 {
     protected function getExtensions(): array
@@ -18,6 +20,7 @@ class RegistrationFormTypeTest extends TypeTestCase
         ];
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testSubmitValidData(): void
     {
         $formData = [

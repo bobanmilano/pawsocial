@@ -1,0 +1,8 @@
+herd:
+    title: "Minu kari"
+    header: "%name% kari"
+    member: "Karja liige"
+    protector: "Karjakaitsja"
+    empty: "Selles karjas pole veel liikmeid"
+    add_pet: "Uus karja liige"
+    nav: "🐕 Minu kari"

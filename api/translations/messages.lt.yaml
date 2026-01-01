@@ -1,0 +1,8 @@
+herd:
+    title: "Mano banda"
+    header: "Vartotojo %name% banda"
+    member: "Bandos narys"
+    protector: "Bandos saugotojas"
+    empty: "Šioje bandoje dar nėra narių"
+    add_pet: "Naujas bandos narys"
+    nav: "🐕 Mano banda"

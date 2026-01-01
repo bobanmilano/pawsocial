@@ -6,10 +6,14 @@
         <div class="mb-3">
             {% for comment in post.comments %}
                 <div class="d-flex mb-2">
-                    <img src="{{ comment.author.imageName ? vich_uploader_asset(comment.author, 'imageFile') : asset('images/default-avatar.png') }}"
-                         class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                    <a href="{{ path('app_user_profile', {id: comment.author.id}) }}" class="text-decoration-none">
+                        <img src="{{ comment.author.imageName ? vich_uploader_asset(comment.author, 'imageFile') : asset('images/default-avatar.png') }}"
+                             class="rounded-circle me-2 hover-scale" style="width: 32px; height: 32px; object-fit: cover;">
+                    </a>
                     <div class="bg-light rounded p-2 flex-grow-1 position-relative">
-                        <strong>{{ comment.author.firstName }} {{ comment.author.lastName }}</strong>
+                        <a href="{{ path('app_user_profile', {id: comment.author.id}) }}" class="text-decoration_none text-dark hover-opacity">
+                            <strong>{{ comment.author.firstName }} {{ comment.author.lastName }}</strong>
+                        </a>
                         <small class="text-muted ms-2">{{ comment.createdAt|date('M d, H:i') }}</small>
                         <p class="mb-0 small">{{ comment.content }}</p>
 

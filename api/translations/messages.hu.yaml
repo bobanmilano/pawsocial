@@ -1,0 +1,8 @@
+herd:
+    title: "Az én csordám"
+    header: "%name% csordája"
+    member: "Csordatag"
+    protector: "Csordavédő"
+    empty: "Ebben a csordában még nincsenek tagok"
+    add_pet: "Új csordatag"
+    nav: "🐕 Az én csordám"

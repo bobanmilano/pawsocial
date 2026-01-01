@@ -1,0 +1,8 @@
+herd:
+    title: "Moja herda"
+    header: "%name%-ova herda"
+    member: "Član herde"
+    protector: "Zaštitnik herde"
+    empty: "Još uvek nema članova u ovoj herdi"
+    add_pet: "Novi član herde"
+    nav: "🐕 Moja herda"

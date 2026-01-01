@@ -1,0 +1,8 @@
+herd:
+    title: "Mans ganāmpulks"
+    header: "Lietotāja %name% ganāmpulks"
+    member: "Ganāmpulka dalībnieks"
+    protector: "Ganāmpulka sargs"
+    empty: "Šajā ganāmpulkā vēl nav dalībnieku"
+    add_pet: "Jauns ganāmpulka dalībnieks"
+    nav: "🐕 Mans ganāmpulks"

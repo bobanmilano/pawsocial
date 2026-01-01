@@ -24,6 +24,6 @@ class ProfileControllerTest extends WebTestCase
         $client->request('GET', '/my-pack/');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h4', 'My Pets');
+        $this->assertSelectorTextContains('h4', 'My Herd');
     }
 }

@@ -6,13 +6,15 @@
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             
-            <div class="d-flex justify-content-center mb-4">
-                <div class="btn-group" role="group" aria-label="Feed filter">
-                    <a href="{{ path('app_feed', {'feed': 'all'}) }}" class="btn {{ feedMode is defined and feedMode == 'all' ? 'btn-primary' : 'btn-outline-primary' }}">
-                        🌍 Global Pack
+            <div class="d-flex justify-content-center mb-5 mt-2">
+                <div class="glass-card p-1 rounded-pill d-inline-flex shadow-sm bg-white bg-opacity-50">
+                    <a href="{{ path('app_feed', {'feed': 'all'}) }}" 
+                       class="btn rounded-pill px-4 py-2 transition-all fw-semibold {{ (feedMode is not defined or feedMode == 'all') ? 'btn-premium' : 'btn-link text-muted text-decoration-none' }}">
+                        <i class="bi bi-globe-americas me-2"></i> Global Pack
                     </a>
-                    <a href="{{ path('app_feed', {'feed': 'following'}) }}" class="btn {{ feedMode is defined and feedMode == 'following' ? 'btn-primary' : 'btn-outline-primary' }}">
-                        🐕 My Pack
+                    <a href="{{ path('app_feed', {'feed': 'following'}) }}" 
+                       class="btn rounded-pill px-4 py-2 transition-all fw-semibold {{ (feedMode is defined and feedMode == 'following') ? 'btn-premium' : 'btn-link text-muted text-decoration-none' }}">
+                        <i class="bi bi-people me-2"></i> My Connections
                     </a>
                 </div>
             </div>

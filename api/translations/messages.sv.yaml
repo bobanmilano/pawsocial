@@ -1,0 +1,8 @@
+herd:
+    title: "Min hjord"
+    header: "%name%s hjord"
+    member: "Medlem av hjorden"
+    protector: "Hjordbeskyddare"
+    empty: "Inga medlemmar i denna hjord än"
+    add_pet: "Ny hjordmedlem"
+    nav: "🐕 Min hjord"

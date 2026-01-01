@@ -3,121 +3,203 @@
 {% block title %}Edit Profile{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <a href="{{ path('app_my_pack') }}" class="btn btn-link mb-3">&larr; Back to Dashboard</a>
-                
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h1 class="card-title mb-4">Settings</h1>
-                        
-                        {# Theme Switcher #}
-                        <div class="mb-5 p-3 bg-light rounded border">
-                            <h5 class="mb-3">🎨 App Appearance</h5>
-                            <div class="d-flex gap-2 flex-wrap">
-                                <a href="{{ path('app_switch_theme', {theme: 'soft-paw'}) }}" class="btn btn-outline-warning {{ app.session.get('active_theme') == 'soft-paw' ? 'active' : '' }}" data-turbo="false">
-                                    🍦 Soft Paw
-                                </a>
-                                <a href="{{ path('app_switch_theme', {theme: 'sunny-park'}) }}" class="btn btn-outline-danger {{ app.session.get('active_theme') == 'sunny-park' ? 'active' : '' }}" data-turbo="false">
-                                    ☀️ Sunny Park
-                                </a>
-                                <a href="{{ path('app_switch_theme', {theme: 'modern-clay'}) }}" class="btn btn-outline-success {{ app.session.get('active_theme') == 'modern-clay' ? 'active' : '' }}" data-turbo="false">
-                                    🌿 Modern Clay
-                                </a>
-                                <a href="{{ path('app_switch_theme', {theme: 'dark-mode'}) }}" class="btn btn-outline-dark {{ app.session.get('active_theme') == 'dark-mode' ? 'active' : '' }}" data-turbo="false">
-                                    🌑 Dark Mode
-                                </a>
-                                
-                                {# Custom Color Trigger #}
-                                <button class="btn btn-outline-primary {{ app.session.get('active_theme') == 'custom' ? 'active' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#customColorPanel" aria-expanded="false">
-                                    🎨 Custom Colors
-                                </button>
-                            </div>
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ path('app_user_profile', {id: targetUser.id}) }}" class="btn btn-link text-decoration-none text-muted p-0 d-flex align-items-center gap-2 hover-opacity">
+                    <i class="bi bi-arrow-left fs-5"></i>
+                    <span class="fw-semibold">Back to Profile</span>
+                </a>
+            </div>
+            
+            <div class="card glass-card border-0 mb-5 overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+                    <h1 class="fw-bold mb-5 d-flex align-items-center gap-3">
+                        <span class="p-3 rounded-4 bg-primary bg-opacity-10 text-primary">⚙️</span>
+                        Account Settings
+                    </h1>
+                    
+                    {# Theme Switcher #}
+                    <div class="mb-5 p-4 rounded-4 bg-white bg-opacity-40 border border-light shadow-sm">
+                        <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                             <span class="text-primary fs-4">🎨</span> App Appearance
+                        </h5>
+                        <div class="row g-3">
+                            {% set themes = [
+                                {id: 'soft-paw', name: 'Soft Paw', icon: '🍦', color: 'warning'},
+                                {id: 'sunny-park', name: 'Sunny Park', icon: '☀️', color: 'danger'},
+                                {id: 'modern-clay', name: 'Modern Clay', icon: '🌿', color: 'success'},
+                                {id: 'dark-mode', name: 'Dark Mode', icon: '🌑', color: 'dark'}
+                            ] %}
                             
-                            {# Custom Color Panel #}
-                            <div class="collapse mt-3 {{ app.session.get('active_theme') == 'custom' ? 'show' : '' }}" id="customColorPanel">
-                                <div class="card card-body border-0 shadow-sm bg-white">
-                                    <form action="{{ path('app_save_custom_colors') }}" method="post" data-turbo="false">
-                                        <div class="row align-items-end">
-                                            <div class="col-md-5 mb-3">
-                                                <label for="primary_color" class="form-label fw-bold">Primary Brand Color</label>
-                                                <input type="color" class="form-control form-control-color w-100" id="primary_color" name="primary_color" value="{{ app.user.primaryColor ?? '#FFB347' }}" title="Choose your color">
-                                            </div>
-                                            <div class="col-md-5 mb-3">
-                                                <label for="secondary_color" class="form-label fw-bold">Accent Color</label>
-                                                <input type="color" class="form-control form-control-color w-100" id="secondary_color" name="secondary_color" value="{{ app.user.secondaryColor ?? '#FFD1DC' }}" title="Choose your color">
-                                            </div>
-                                            <div class="col-md-2 mb-3">
-                                                <button type="submit" class="btn btn-primary w-100 h-100" style="min-height: 38px;">Save</button>
+                            {% for theme in themes %}
+                                <div class="col-6 col-sm-3 text-center">
+                                    <a href="{{ path('app_switch_theme', {theme: theme.id}) }}" 
+                                       class="d-block p-3 rounded-4 text-decoration-none border transition-all {{ app.session.get('active_theme') == theme.id ? 'border-primary bg-white shadow-sm' : 'border-light bg-light bg-opacity-50 grayscale-hover' }}"
+                                       data-turbo="false"
+                                       style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                                        <div class="fs-2 mb-2">{{ theme.icon }}</div>
+                                        <div class="small fw-bold {{ app.session.get('active_theme') == theme.id ? 'text-primary' : 'text-muted' }}">
+                                            {{ theme.name }}
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        {# Custom Color Trigger #}
+                        <div class="mt-4 text-center">
+                            <button class="btn btn-link text-decoration-none fw-bold text-muted small hover-opacity" 
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#customColorPanel" aria-expanded="false">
+                                <i class="bi bi-palette me-2"></i> Custom Mix & Match
+                            </button>
+                        </div>
+                        
+                        {# Custom Color Panel #}
+                        <div class="collapse mt-4 {{ app.session.get('active_theme') == 'custom' ? 'show' : '' }}" id="customColorPanel">
+                            <div class="p-4 rounded-4 bg-white bg-opacity-50 border border-light shadow-inner">
+                                <form action="{{ path('app_save_custom_colors', {id: targetUser.id}) }}" method="post" data-turbo="false">
+                                    <div class="row g-4 align-items-end text-start">
+                                         <div class="col-md-5">
+                                            <label for="primary_color" class="form-label fw-bold small text-muted text-uppercase mb-2">Primary Color</label>
+                                            <div class="input-group">
+                                                <input type="color" class="form-control form-control-color border-0 rounded-start-4 w-25" id="primary_color" name="primary_color" value="{{ targetUser.primaryColor ?? '#FFB347' }}">
+                                                <input type="text" class="form-control border-0 bg-light bg-opacity-50 rounded-end-4 font-monospace small" readonly value="{{ targetUser.primaryColor ?? '#FFB347' }}">
                                             </div>
                                         </div>
-                                    </form>
+                                        <div class="col-md-5">
+                                            <label for="secondary_color" class="form-label fw-bold small text-muted text-uppercase mb-2">Accent Color</label>
+                                            <div class="input-group">
+                                                <input type="color" class="form-control form-control-color border-0 rounded-start-4 w-25" id="secondary_color" name="secondary_color" value="{{ targetUser.secondaryColor ?? '#FFD1DC' }}">
+                                                <input type="text" class="form-control border-0 bg-light bg-opacity-50 rounded-end-4 font-monospace small" readonly value="{{ targetUser.secondaryColor ?? '#FFD1DC' }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100 rounded-pill py-2 fw-bold">Update Mix</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                        <span class="text-primary fs-4">🪪</span> Personal Data
+                    </h5>
+                    {{ form_start(form) }}
+                      <div class="row g-4">
+                            {# Cover Image Upload #}
+                            <div class="col-12" data-controller="image-preview">
+                                <label class="form-label fw-bold small text-muted text-uppercase mb-3">Cover Image</label>
+                                <div class="position-relative mb-3 overflow-hidden rounded-4 shadow-sm border border-light bg-light" style="height: 250px;">
+                                    {% if targetUser.coverImageName %}
+                                       <img src="{{ asset('/uploads/covers/' ~ targetUser.coverImageName) }}" 
+                                            data-image-preview-target="preview" 
+                                            class="img-fluid w-100 h-100" 
+                                            style="object-fit: cover;" 
+                                            alt="Cover Preview">
+                                    {% else %}
+                                        <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted" 
+                                             data-image-preview-target="placeholder">
+                                            <i class="bi bi-image fs-1 opacity-25 mb-2"></i>
+                                            <span class="small fw-semibold">Upload Background Image</span>
+                                        </div>
+                                        <img src="#" data-image-preview-target="preview" class="img-fluid w-100 h-100 d-none" style="object-fit: cover;" alt="New Cover Preview">
+                                    {% endif %}
+                                </div>
+                                {{ form_widget(form.coverImageFile, {'attr': {
+                                    'class': 'form-control form-control-sm border-0 bg-light rounded-pill px-3 py-2',
+                                    'data-image-preview-target': 'input', 
+                                    'data-action': 'change->image-preview#readURL'
+                                }}) }}
+                                {{ form_errors(form.coverImageFile) }}
+                            </div>
+                            
+                            <div class="col-md-4 text-center" data-controller="image-preview">
+                                <label class="form-label fw-bold small text-muted text-uppercase mb-3">Avatar</label>
+                                <div class="position-relative mx-auto mb-3 rounded-circle shadow border border-4 border-white overflow-hidden bg-light" style="width: 160px; height: 160px;">
+                                    {% if targetUser.imageName %}
+                                        <img src="{{ asset('/uploads/avatars/' ~ targetUser.imageName) }}" data-image-preview-target="preview" class="w-100 h-100" style="object-fit: cover;" alt="Avatar">
+                                    {% else %}
+                                        <div class="w-100 h-100 d-flex align-items-center justify-content-center" data-image-preview-target="placeholder">
+                                            <i class="bi bi-person fs-1 opacity-25"></i>
+                                        </div>
+                                        <img src="#" data-image-preview-target="preview" class="w-100 h-100 d-none" style="object-fit: cover;" alt="Preview">
+                                    {% endif %}
+                                </div>
+                                {{ form_widget(form.imageFile, {'attr': {
+                                    'class': 'form-control form-control-sm border-0 bg-light rounded-pill px-3 py-2',
+                                    'data-image-preview-target': 'input', 
+                                    'data-action': 'change->image-preview#readURL'
+                                }}) }}
+                                {{ form_errors(form.imageFile) }}
+                            </div>
+                            
+                            <div class="col-md-8">
+                                 <div class="p-4 rounded-4 bg-light bg-opacity-30 border border-light h-100">
+                                    <label class="form-label fw-bold small text-muted text-uppercase mb-4">Identity Details</label>
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            {{ form_label(form.firstName, targetUser.accountType == 'pet' ? 'Pet Name' : 'First Name', {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                            {{ form_widget(form.firstName, {'attr': {'class': 'form-control border-0 bg-white rounded-3 shadow-sm'}}) }}
+                                        </div>
+                                        <div class="col-6">
+                                            {{ form_label(form.lastName, targetUser.accountType == 'pet' ? 'Suffix/Title' : 'Last Name', {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                            {{ form_widget(form.lastName, {'attr': {'class': 'form-control border-0 bg-white rounded-3 shadow-sm'}}) }}
+                                        </div>
+                                        {% if targetUser.accountType != 'pet' %}
+                                            <div class="col-12 mt-4">
+                                                {{ form_label(form.organizationName, 'Business or Shelter Name (Optional)', {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                                {{ form_widget(form.organizationName, {'attr': {'class': 'form-control border-0 bg-white rounded-3 shadow-sm', 'placeholder': 'e.g. Happy Paws Shelter'}}) }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                         
+                         <div class="mt-5 p-4 rounded-4 bg-white bg-opacity-40 border border-light shadow-sm">
+                            <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                                <span class="text-primary fs-4">🏠</span> Address & Preferences
+                            </h5>
+                            <div class="row g-4">
+                                <div class="col-md-8">
+                                    {{ form_label(form.street, 'Street', {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                    {{ form_widget(form.street, {'attr': {'class': 'form-control border-0 bg-white rounded-3 shadow-sm', 'placeholder': 'e.g. Baker Street'}}) }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form_label(form.houseNumber, 'Nr.', {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                    {{ form_widget(form.houseNumber, {'attr': {'class': 'form-control border-0 bg-white rounded-3 shadow-sm', 'placeholder': '221B'}}) }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form_label(form.zipCode, 'ZIP Code', {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                    {{ form_widget(form.zipCode, {'attr': {'class': 'form-control border-0 bg-white rounded-3 shadow-sm', 'placeholder': '12345'}}) }}
+                                </div>
+                                <div class="col-md-8">
+                                    {{ form_label(form.city, 'City', {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                    {{ form_widget(form.city, {'attr': {'class': 'form-control border-0 bg-white rounded-3 shadow-sm', 'placeholder': 'London'}}) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_label(form.country, 'Country', {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                    {{ form_widget(form.country, {'attr': {'class': 'form-select border-0 bg-white rounded-3 shadow-sm'}}) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_label(form.locale, 'Application Language', {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                    {{ form_widget(form.locale, {'attr': {'class': 'form-select border-0 bg-white rounded-3 shadow-sm fs-5'}}) }}
+                                    <div class="form-text small opacity-75 mt-2">Choose your preferred language for the whole app.</div>
                                 </div>
                             </div>
                         </div>
 
-                        <h5 class="mb-3">Edit Profile Data</h5>
-                        {{ form_start(form) }}
-                          <div class="row">
-                                {# Cover Image Upload #}
-                                <div class="col-12 mb-4" data-controller="image-preview">
-                                    <label class="form-label fw-bold">Cover Image</label>
-                                    <div class="position-relative mb-2">
-                                        {% if app.user.coverImageName %}
-                                           <img src="{{ asset('/uploads/covers/' ~ app.user.coverImageName) }}" 
-                                                data-image-preview-target="preview" 
-                                                class="img-fluid w-100 rounded shadow-sm" 
-                                                style="height: 200px; object-fit: cover;" 
-                                                alt="Cover Preview">
-                                        {% else %}
-                                            <div class="bg-secondary w-100 rounded d-flex align-items-center justify-content-center text-white" 
-                                                 data-image-preview-target="preview"
-                                                 style="height: 200px;">
-                                                <span>No Cover Image</span>
-                                            </div>
-                                            {# Hidden image tag for preview logic if needed, or just replace the div's content/style via JS? 
-                                               The simplified controller usually targets an <img> src. 
-                                               Let's make sure we have an img tag available even if hidden initially, or use the existing logic check.
-                                            #}
-                                            <img src="#" data-image-preview-target="preview" class="img-fluid w-100 rounded shadow-sm d-none" style="height: 200px; object-fit: cover;" alt="New Cover Preview">
-                                        {% endif %}
-                                    </div>
-                                    {{ form_widget(form.coverImageFile, {'attr': {'data-image-preview-target': 'input', 'data-action': 'change->image-preview#readURL'}}) }}
-                                    {{ form_errors(form.coverImageFile) }}
-                                </div>
-                                
-                                <div class="col-md-4 text-center mb-3" data-controller="image-preview">
-                                    <label class="form-label fw-bold">Profile Picture</label>
-                                    {% if app.user.imageName %}
-                                        <img src="{{ asset('/uploads/avatars/' ~ app.user.imageName) }}" data-image-preview-target="preview" class="rounded-circle img-fluid mb-2" style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar">
-                                    {% else %}
-                                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2NjYyIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5ZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjxwYXRoIGQ9Ik0xMiA4djhNMCAxMmgyNCIvPjwvc3ZnPg==" 
-                                             data-image-preview-target="preview" 
-                                             class="rounded-circle img-fluid mb-2 d-none" 
-                                             style="width: 150px; height: 150px; object-fit: cover;" alt="Preview">
-                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 150px; height: 150px; font-size: 3rem;">👤</div>
-                                    {% endif %}
-                                    
-                                    {{ form_widget(form.imageFile, {'attr': {'data-image-preview-target': 'input', 'data-action': 'change->image-preview#readURL'}}) }}
-                                    {{ form_errors(form.imageFile) }}
-                                </div>
-                                <div class="col-md-8">
-                                    <h5 class="mb-3">Personal Details</h5>
-                                    <div class="row">
-                                        <div class="col-6">{{ form_row(form.firstName) }}</div>
-                                        <div class="col-6">{{ form_row(form.lastName) }}</div>
-                                    </div>
-                                    {{ form_row(form.organizationName) }}
-                                </div>
-                            </div>
-                            
-                            <hr>
-                            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
-                        {{ form_end(form) }}
-                    </div>
+                        <div class="mt-5 pt-4 border-top border-light">
+                            <button type="submit" class="btn btn-premium btn-lg w-100 shadow-lg py-3">
+                                <i class="bi bi-cloud-arrow-up me-2"></i> Save All Changes
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
                 </div>
             </div>
         </div>
+    </div>
     </div>
 {% endblock %}

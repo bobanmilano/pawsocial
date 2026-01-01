@@ -1,0 +1,8 @@
+herd:
+    title: "La mia mandria"
+    header: "Il branco di %name%" # "Branco" is more common for mixed animal groups in IT, but "Mandria" is the literal translation of Herd. User liked Herd-vibe, so I'll try to balance.
+    member: "Membro del branco"
+    protector: "Guardiano della mandria"
+    empty: "Nessun membro in questo branco/mandria"
+    add_pet: "Nuovo membro del branco"
+    nav: "🐕 La mia mandria"

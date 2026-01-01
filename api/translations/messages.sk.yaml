@@ -1,0 +1,8 @@
+herd:
+    title: "Moje stádo"
+    header: "Stádo používateľa %name%"
+    member: "Člen stáda"
+    protector: "Ochranca stáda"
+    empty: "V tomto stáde zatiaľ nie sú žiadni členovia"
+    add_pet: "Nový člen stáda"
+    nav: "🐕 Moje stádo"

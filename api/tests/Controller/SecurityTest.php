@@ -13,15 +13,21 @@ class SecurityTest extends WebTestCase
         $crawler = $client->request('GET', '/register');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Register for Pawsocial');
+        $this->assertSelectorTextContains('h2', 'Join the Pack!');
 
         $testEmail = 'newuser_' . uniqid() . '@example.com';
 
-        $form = $crawler->selectButton('Register')->form();
+        $form = $crawler->selectButton('Create Account')->form();
         $form['registration_form[email]'] = $testEmail;
         $form['registration_form[plainPassword]'] = 'password123';
         $form['registration_form[agreeTerms]'] = true;
-        $form['registration_form[accountType]'] = 'private';
+        // zipCode and city are required but not in the manual twig? 
+        // Wait, RegistrationFormType has them. 
+        // If they are not rendered, they won't be in the form unless they are hidden.
+        // Actually, form_end(registrationForm) renders unrendered fields.
+        $form['registration_form[zipCode]'] = '12345';
+        $form['registration_form[city]'] = 'Berlin';
+        $form['registration_form[country]'] = 'DE';
 
         $client->submit($form);
 
@@ -56,7 +62,7 @@ class SecurityTest extends WebTestCase
         $client->request('GET', '/login');
         $this->assertResponseIsSuccessful();
 
-        $client->submitForm('Sign in', [
+        $client->submitForm('Sign In', [
             '_username' => 'non_existent@example.com',
             '_password' => 'wrong',
         ]);

@@ -1,0 +1,8 @@
+herd:
+    title: "Il-merħla tiegħi"
+    header: "Il-merħla ta' %name%"
+    member: "Membru tal-merħla"
+    protector: "Protettur tal-merħla"
+    empty: "Għadu m'hemmx membri f'din il-merħla"
+    add_pet: "Membru ġdid tal-merħla"
+    nav: "🐕 Il-merħla tiegħi"

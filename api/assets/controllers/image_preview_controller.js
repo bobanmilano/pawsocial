@@ -1,10 +1,9 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ['input', 'preview'];
+    static targets = ['input', 'preview', 'placeholder'];
 
     connect() {
-        // Optional: log to check connection
         // console.log('Image preview controller connected');
     }
 
@@ -14,8 +13,14 @@ export default class extends Controller {
             const reader = new FileReader();
 
             reader.onload = (e) => {
-                this.previewTarget.src = e.target.result;
-                this.previewTarget.classList.remove('d-none');
+                if (this.hasPreviewTarget) {
+                    this.previewTarget.src = e.target.result;
+                    this.previewTarget.classList.remove('d-none');
+                }
+
+                if (this.hasPlaceholderTarget) {
+                    this.placeholderTarget.classList.add('d-none');
+                }
             }
 
             reader.readAsDataURL(input.files[0]);

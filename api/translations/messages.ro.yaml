@@ -1,0 +1,8 @@
+herd:
+    title: "Cireada mea"
+    header: "Cireada lui %name%"
+    member: "Membru al cirezii"
+    protector: "Protectorul cirezii"
+    empty: "Încă nu sunt membri în această cireadă"
+    add_pet: "Membru nou al cirezii"
+    nav: "🐕 Cireada mea"

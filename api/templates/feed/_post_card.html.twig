@@ -1,129 +1,133 @@
-<div class="card shadow-sm mb-4 border-0" id="post-{{ post.id }}">
-    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3 pb-0">
-        <div class="d-flex align-items-center mb-3">
+<div class="card glass-card mb-4 animate-fade-in" id="post-{{ post.id }}">
+    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-4 pb-0 px-4">
+        <div class="d-flex align-items-center mb-0">
             {# Avatar Selection #}
             {% if post.postedByAnimal %}
-                {% if post.postedByAnimal.imageName %}
-                     <img src="{{ asset('/uploads/animals/' ~ post.postedByAnimal.imageName) }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;" alt="{{ post.postedByAnimal.name }}">
-                {% else %}
-                     {% set emoji = post.postedByAnimal.species == 'dog' ? '🐶' : (post.postedByAnimal.species == 'cat' ? '🐱' : '🐾') %}
-                     <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">{{ emoji }}</div>
-                {% endif %}
+                <a href="{{ path('app_user_profile', {id: post.postedByAnimal.userAccount.id}) }}" class="text-decoration-none">
+                    <div class="position-relative me-3 hover-scale">
+                        {% if post.postedByAnimal.imageName %}
+                            <img src="{{ asset('/uploads/animals/' ~ post.postedByAnimal.imageName) }}" class="rounded-circle shadow-sm border border-2 border-white" style="width: 50px; height: 50px; object-fit: cover;" alt="{{ post.postedByAnimal.name }}">
+                        {% else %}
+                            {% set emoji = post.postedByAnimal.species == 'dog' ? '🐶' : (post.postedByAnimal.species == 'cat' ? '🐱' : '🐾') %}
+                            <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center border border-2 border-white" style="width: 50px; height: 50px; font-size: 1.5rem;">{{ emoji }}</div>
+                        {% endif %}
+                        <div class="position-absolute bottom-0 end-0 bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center border border-1 border-light" style="width: 20px; height: 20px; font-size: 0.6rem;">👤</div>
+                    </div>
+                </a>
             {% else %}
                 {# User Avatar #}
-                {% if post.author.imageName %}
-                    <img src="{{ asset('/uploads/avatars/' ~ post.author.imageName) }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;" alt="{{ post.author.firstName }}">
-                {% else %}
-                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">👤</div>
-                {% endif %}
+                <a href="{{ path('app_user_profile', {id: post.author.id}) }}" class="text-decoration-none">
+                    <div class="me-3 hover-scale">
+                        {% if post.author.imageName %}
+                            <img src="{{ asset('/uploads/avatars/' ~ post.author.imageName) }}" class="rounded-circle shadow-sm border border-2 border-white" style="width: 50px; height: 50px; object-fit: cover;" alt="{{ post.author.firstName }}">
+                        {% else %}
+                            <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center border border-2 border-white" style="width: 50px; height: 50px; font-size: 1.2rem;">👤</div>
+                        {% endif %}
+                    </div>
+                </a>
             {% endif %}
             
             <div class="lh-sm">
                 {% if post.postedByAnimal %}
-                    <!-- Posted by Animal -->
                     <h6 class="mb-0 fw-bold">
-                         <a href="{{ path('app_user_profile', {id: post.author.id}) }}" class="text-decoration-none text-dark">
+                         <a href="{{ path('app_user_profile', {id: post.postedByAnimal.userAccount.id}) }}" class="text-decoration-none text-dark hover-opacity">
                             {{ post.postedByAnimal.name }} 🐾
                          </a>
                     </h6>
-                    <small class="text-muted" style="font-size: 0.85rem;">via {{ post.author.firstName }}</small>
+                    <small class="text-muted opacity-75" style="font-size: 0.75rem;">via <a href="{{ path('app_user_profile', {id: post.author.id}) }}" class="text-decoration-none text-muted hover-opacity">{{ post.author.firstName }}</a></small>
                 {% else %}
-                    <!-- Posted by User -->
                     <h6 class="mb-0 fw-bold">
-                        <a href="{{ path('app_user_profile', {id: post.author.id}) }}" class="text-decoration-none text-dark">
+                        <a href="{{ path('app_user_profile', {id: post.author.id}) }}" class="text-decoration-none text-dark hover-opacity">
                             {{ post.author.firstName }} {{ post.author.lastName }}
                         </a>
                     </h6>
                 {% endif %}
-                <div class="text-muted small">{{ post.createdAt|date('M d, Y • H:i') }}
+                <div class="text-muted opacity-50 small" style="font-size: 0.7rem;">{{ post.createdAt|date('M d, Y • H:i') }}
                     {% if not post.showInFeed %}
-                        <span class="badge bg-secondary ms-1" style="font-size: 0.7em;">🔒 Profile Only</span>
+                        <span class="badge bg-light text-muted ms-1" style="font-size: 0.8em; border: 1px solid rgba(0,0,0,0.05);">🔒 Profile Only</span>
                     {% endif %}
                 </div>
             </div>
         </div>
         
         <div class="dropdown">
-            <button class="btn btn-link text-muted p-0 text-decoration-none" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <span class="fs-4">⋮</span>
+            <button class="btn btn-link text-muted p-2 text-decoration-none rounded-circle hover-bg-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-three-dots-vertical"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg glass-card">
                 {% if app.user == post.author %}
                      <li>
                         <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}" onsubmit="return confirm('Are you sure you want to delete this post?');">
                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
-                            <button type="submit" class="dropdown-item text-danger">🗑️ Delete</button>
+                            <button type="submit" class="dropdown-item text-danger d-flex align-items-center">
+                                <i class="bi bi-trash3 me-2"></i> Delete Post
+                            </button>
                         </form>
                     </li>
                 {% else %}
                     <li>
-                        {# Link to Report functionality (to be implemented) #}
-                        <a class="dropdown-item" href="{{ path('app_report_post', {'id': post.id}) }}">⚠️ Report</a>
+                        <a class="dropdown-item d-flex align-items-center" href="{{ path('app_report_post', {'id': post.id}) }}">
+                            <i class="bi bi-flag me-2"></i> Report
+                        </a>
                     </li>
                 {% endif %}
             </ul>
         </div>
     </div>
 
-    <div class="card-body bg-white">
-        <p class="card-text mb-3" style="white-space: pre-wrap;">{{ post.content }}</p>
+    <div class="card-body bg-transparent px-4 pt-3 pb-2">
+        <p class="card-text mb-3 lead-sm" style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.6;">{{ post.content }}</p>
         
         {% if post.imageName %}
-            <div class="mb-3 rounded overflow-hidden shadow-sm">
-                <img src="{{ asset('/uploads/posts/' ~ post.imageName) }}" class="img-fluid w-100" alt="Post Image">
+            <div class="mb-3 rounded-4 overflow-hidden shadow-sm border border-light">
+                <img src="{{ asset('/uploads/posts/' ~ post.imageName) }}" class="img-fluid w-100" alt="Post Image" style="max-height: 600px; object-fit: cover;">
             </div>
         {% endif %}
         {% set videoId = post.videoId %}
         {% if videoId %}
-            <div class="ratio ratio-16x9">
+            <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-sm border border-light mb-3">
                 <iframe src="https://www.youtube.com/embed/{{ videoId }}" title="YouTube video" allowfullscreen></iframe>
             </div>
         {% endif %}
     </div>
 
-    <div class="card-footer bg-white">
-        <div class="d-flex justify-content-between align-items-center">
-            
-            {# Turbo Frame for Like Button #}
-            <turbo-frame id="post_like_section_{{ post.id }}">
-                {% set isLiked = false %}
-                {% if app.user %}
-                    {% for like in post.postLikes %}
-                        {% if like.user == app.user %}
-                            {% set isLiked = true %}
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-
+    <div class="card-footer bg-transparent border-0 px-4 pb-4 pt-0">
+        <div class="d-flex justify-content-between align-items-center border-top pt-3 opacity-90">
+            {# Like Button #}
+            <turbo-frame id="like_post_{{ post.id }}">
                 <form action="{{ path('app_post_like', {id: post.id}) }}" method="post" class="d-inline">
                     <input type="hidden" name="_token" value="{{ csrf_token('like' ~ post.id) }}">
-                    <button type="submit" class="btn btn-link text-decoration-none p-0 me-3 {{ isLiked ? 'text-danger' : 'text-muted' }}">
-                        <i class="bi {{ isLiked ? 'bi-heart-fill' : 'bi-heart' }}"></i>
-                        <span>{{ post.postLikes|length }}</span>
+                    {% set isLiked = app.user and post.isLikedByUser(app.user) %}
+                    <button type="submit" class="btn btn-link text-decoration-none text-muted p-2 rounded-pill hover-bg-light d-flex align-items-center gap-2 btn-like {{ isLiked ? 'active animate-heart-beat' : '' }}" style="transition: var(--transition-soft);">
+                        <i class="bi {{ isLiked ? 'bi-heart-fill text-danger' : 'bi-heart' }} fs-5"></i>
+                        <span class="fw-bold">{{ post.postLikes|length }}</span>
                     </button>
                 </form>
             </turbo-frame>
 
             {# Comment Toggle / Count #}
-            <button class="btn btn-link text-decoration-none text-muted p-0" 
-                    type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.id }}">
-                <i class="bi bi-chat"></i> <span id="post_comment_count_{{ post.id }}">{{ post.comments|length }}</span> Comments
+            <button class="btn btn-link text-decoration-none text-muted p-2 rounded-pill hover-bg-light d-flex align-items-center gap-2" 
+                    type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.id }}" style="transition: var(--transition-soft);">
+                <i class="bi bi-chat fs-5"></i> <span id="post_comment_count_{{ post.id }}" class="fw-bold">{{ post.comments|length }}</span>
             </button>
-            
+
             {# Share Button #}
-            <button class="btn btn-link text-decoration-none text-muted p-0"
+            <button class="btn btn-link text-decoration-none text-muted p-2 rounded-pill hover-bg-light d-flex align-items-center gap-2"
                     data-controller="share"
                     data-share-title-value="Post by {{ post.author.firstName }}"
                     data-share-text-value="{{ post.content|striptags|slice(0, 100) }}..."
                     data-share-url-value="{{ url('app_post_show', {id: post.id}) }}"
-                    data-action="click->share#share">
-                <i class="bi bi-share"></i> Share
+                    data-action="click->share#share"
+                    style="transition: var(--transition-soft);">
+                <i class="bi bi-share fs-5"></i> <span class="d-none d-sm-inline fw-bold">Share</span>
             </button>
         </div>
 
         {# Collapsible Comments Section #}
-        <div class="collapse mt-3" id="comments-{{ post.id }}">
-            {% include 'feed/_comments_section.html.twig' %}
+        <div class="collapse" id="comments-{{ post.id }}">
+            <div class="mt-3 p-3 rounded-4 bg-light bg-opacity-50 border border-light shadow-inner">
+                {% include 'feed/_comments_section.html.twig' %}
+            </div>
         </div>
     </div>
 </div>

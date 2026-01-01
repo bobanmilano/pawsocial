@@ -1,0 +1,8 @@
+herd:
+    title: "Meu rebanho"
+    header: "O rebanho de %name%"
+    member: "Membro do rebanho"
+    protector: "Protetor do rebanho"
+    empty: "Ainda não há membros neste rebanho"
+    add_pet: "Adicionar animal"
+    nav: "🐕 Meu rebanho"

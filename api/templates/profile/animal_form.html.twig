@@ -3,39 +3,98 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <a href="{{ path('app_my_pack') }}" class="btn btn-link mb-3">&larr; Back to Pack</a>
-        
-        <div class="card">
-            <div class="card-body">
-                <h1 class="card-title mb-4">{{ title }}</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ path('app_my_pack') }}" class="btn btn-link text-decoration-none text-muted p-0 d-flex align-items-center gap-2 hover-opacity">
+                    <i class="bi bi-arrow-left fs-5"></i>
+                    <span class="fw-semibold">Back to Pack</span>
+                </a>
+            </div>
+            
+            <div class="card glass-card border-0 mb-5 overflow-hidden animate-fade-in">
+                <div class="card-body p-4 p-md-5">
+                    <h1 class="fw-bold mb-5 d-flex align-items-center gap-3">
+                         <span class="p-3 rounded-4 bg-primary bg-opacity-10 text-primary">🐾</span>
+                         {{ title }}
+                    </h1>
 
-                {{ form_start(form) }}
-                    {{ form_row(form.name) }}
-                    {{ form_row(form.imageFile) }}
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ form_row(form.species) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(form.breed) }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {{ form_row(form.gender) }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form_row(form.birthDate) }}
-                        </div>
-                    </div>
-                    
-                    <div class="my-3">
-                        {{ form_row(form.isAdoptable) }}
-                    </div>
+                    {{ form_start(form) }}
+                        <div class="row g-4">
+                             {# Animal Image Section #}
+                            <div class="col-12 mb-2" data-controller="image-preview">
+                                <label class="form-label fw-bold small text-muted text-uppercase mb-3">Pet Photo</label>
+                                <div class="position-relative mx-auto mb-4 overflow-hidden rounded-4 shadow-sm border border-light group-hover" style="max-width: 300px;">
+                                    {% if animal is defined and animal.imageName %}
+                                        <img src="{{ asset('/uploads/animals/' ~ animal.imageName) }}" data-image-preview-target="preview" class="img-fluid w-100 h-100" style="height: 300px; object-fit: cover;" alt="{{ animal.name }}">
+                                    {% else %}
+                                        <div class="bg-light w-100 d-flex flex-column align-items-center justify-content-center text-muted border-dashed border-2 m-2 rounded-4" 
+                                             data-image-preview-target="preview"
+                                             style="height: 284px;">
+                                            <i class="bi bi-camera fs-1 opacity-25 mb-2"></i>
+                                            <span class="small fw-semibold text-center px-3">Upload your pet's best look</span>
+                                        </div>
+                                        <img src="#" data-image-preview-target="preview" class="img-fluid w-100 d-none" style="height: 300px; object-fit: cover;" alt="Preview">
+                                    {% endif %}
+                                </div>
+                                <div class="mx-auto" style="max-width: 300px;">
+                                    {{ form_widget(form.imageFile, {'attr': {
+                                        'class': 'form-control form-control-sm border-0 bg-light rounded-pill px-3 py-2',
+                                        'data-image-preview-target': 'input', 
+                                        'data-action': 'change->image-preview#readURL'
+                                    }}) }}
+                                    {{ form_errors(form.imageFile) }}
+                                </div>
+                            </div>
 
-                    <button type="submit" class="btn btn-success w-100">Save Profile</button>
-                {{ form_end(form) }}
+                            <div class="col-12">
+                                <div class="p-4 rounded-4 bg-light bg-opacity-30 border border-light">
+                                    <label class="form-label fw-bold small text-muted text-uppercase mb-4">Core Information</label>
+                                    <div class="row g-3">
+                                        <div class="col-md-12">
+                                            {{ form_label(form.name, null, {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                            {{ form_widget(form.name, {'attr': {'class': 'form-control border-0 bg-white rounded-3 shadow-sm', 'placeholder': 'e.g. Buddy, Luna...'}}) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_label(form.species, null, {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                            {{ form_widget(form.species, {'attr': {'class': 'form-select border-0 bg-white rounded-3 shadow-sm'}}) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_label(form.breed, null, {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                            {{ form_widget(form.breed, {'attr': {'class': 'form-control border-0 bg-white rounded-3 shadow-sm', 'placeholder': 'e.g. Golden Retriever'}}) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_label(form.gender, null, {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                            {{ form_widget(form.gender, {'attr': {'class': 'form-select border-0 bg-white rounded-3 shadow-sm'}}) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_label(form.birthDate, 'Birth Date / Adoption Day', {'label_attr': {'class': 'small fw-bold text-muted mb-1'}}) }}
+                                            {{ form_widget(form.birthDate, {'attr': {'class': 'form-control border-0 bg-white rounded-3 shadow-sm'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="p-4 rounded-4 bg-white bg-opacity-40 border border-light">
+                                    <div class="form-check form-switch custom-switch d-flex align-items-center gap-3">
+                                        {{ form_widget(form.isAdoptable, {'attr': {'class': 'form-check-input ms-0', 'style': 'width: 3em; height: 1.5em;'}}) }}
+                                        <div>
+                                            {{ form_label(form.isAdoptable, 'Available for Adoption', {'label_attr': {'class': 'form-check-label fw-bold mb-0'}}) }}
+                                            <p class="text-muted small mb-0">List this pet as looking for a forever home in the Global Pack feed.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 pt-4 border-top border-light">
+                            <button type="submit" class="btn btn-premium btn-lg w-100 shadow-lg py-3">
+                                <i class="bi bi-heart-fill me-2"></i> Save Pet Profile
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
             </div>
         </div>
     </div>

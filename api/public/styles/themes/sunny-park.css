@@ -1,53 +1,46 @@
 :root {
-    --primary-color: #FF6B6B;
+    --primary-hsl: 0, 100%, 71%;
     /* Vibrant Coral */
-    --primary-hover: #FF8787;
-    --secondary-color: #4ECDC4;
-    /* Teal/Turquoise */
-    --bg-color: #F7F9F9;
-    /* Cool Lighter Grey */
-    --card-bg-color: #FFFFFF;
+    --primary-color: hsl(var(--primary-hsl));
+    --secondary-hsl: 177, 56%, 55%;
+    /* Teal */
+    --secondary-color: hsl(var(--secondary-hsl));
+
+    --bg-color: #F0F7F7;
+    --card-bg: rgba(255, 255, 255, 0.9);
     --text-color: #2D3436;
-    /* Dark Grey */
     --text-muted: #636E72;
 
-    --border-radius-card: 12px;
-    --border-radius-btn: 50px;
-    /* Pill shaped */
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(0, 0, 0, 0.05);
+    --glass-blur: 10px;
+    --glass-shadow: 6px 6px 0px rgba(0, 0, 0, 0.05);
 
-    --box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
-    /* Hard shadow, playful */
-
-    --font-family: 'Poppins', sans-serif;
-    /* Geometric, energetic */
+    --font-heading: 'Poppins', sans-serif;
 }
 
 body {
-    background-color: var(--bg-color) !important;
-    color: var(--text-color) !important;
-    font-family: var(--font-family) !important;
+    background: radial-gradient(circle at top left, #F0F7F7 0%, #E0EDED 100%) !important;
 }
 
 .card {
-    border-radius: var(--border-radius-card) !important;
-    border: 2px solid #000000 !important;
-    /* Comic style border */
-    box-shadow: var(--box-shadow) !important;
+    background: var(--card-bg) !important;
+    border: 2px solid #2d3436 !important;
+    box-shadow: var(--glass-shadow) !important;
 }
 
 .btn-primary {
-    background-color: var(--primary-color) !important;
-    border-color: #000000 !important;
-    border-width: 2px !important;
-    color: white !important;
-    border-radius: var(--border-radius-btn) !important;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    background: var(--primary-color) !important;
+    border: 2px solid #2d3436 !important;
+    box-shadow: 4px 4px 0px #2d3436 !important;
+}
+
+.btn-primary:hover {
+    transform: translate(-2px, -2px) !important;
+    box-shadow: 6px 6px 0px #2d3436 !important;
 }
 
 .navbar {
-    background-color: #FFE66D !important;
-    /* Sunny Yellow */
-    border-bottom: 2px solid #000000;
+    background: #FFE66D !important;
+    border-bottom: 3px solid #2d3436 !important;
 }

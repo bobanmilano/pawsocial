@@ -1,0 +1,8 @@
+herd:
+    title: "Mon troupeau"
+    header: "Le troupeau de %name%"
+    member: "Membre du troupeau"
+    protector: "Gardien du troupeau"
+    empty: "Aucun membre dans ce troupeau pour l'instant"
+    add_pet: "Nouveau membre du troupeau"
+    nav: "🐕 Mon troupeau"

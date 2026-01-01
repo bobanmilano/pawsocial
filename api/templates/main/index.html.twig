@@ -3,12 +3,49 @@
 {% block title %}Welcome to Pawsocial!{% endblock %}
 
 {% block body %}
-    <div class="card">
-        <h1>🐾 Welcome to Pawsocial</h1>
-        <p>Your new favorite social network for pets and animal lovers.</p>
-        
-        <p>
-            <a href="/api" class="btn">Go to API Documentation</a>
-        </p>
+    <div class="hero-section text-center py-5 mb-5 animate-fade-in">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="mb-4">
+                    <img src="{{ asset('images/logo-paw-rb.png') }}" alt="Pawsocial" height="120" class="animate-pulse">
+                </div>
+                <h1 class="display-3 fw-bold mb-3">Where the Pack Connects 🐕</h1>
+                <p class="lead text-muted mb-5 fs-4">Join the world's first premium social network designed exclusively for pets and the people who love them.</p>
+                
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    {% if not app.user %}
+                        <a href="{{ path('app_register') }}" class="btn btn-premium btn-lg px-5 shadow-lg">Become a Member</a>
+                        <a href="{{ path('app_login') }}" class="btn btn-white-glass btn-lg px-5">Sign In</a>
+                    {% else %}
+                        <a href="{{ path('app_feed') }}" class="btn btn-premium btn-lg px-5 shadow-lg">Enter the Feed</a>
+                        <a href="{{ path('app_my_pack') }}" class="btn btn-white-glass btn-lg px-5">Manage My Pack</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4 animate-fade-in" style="animation-delay: 0.1s;">
+            <div class="card glass-card border-0 h-100 p-4 text-center">
+                <div class="fs-1 mb-3">📸</div>
+                <h4 class="fw-bold">Share Moments</h4>
+                <p class="text-muted mb-0">Post photos and videos of your pets. Let the world see their unique personality!</p>
+            </div>
+        </div>
+        <div class="col-md-4 animate-fade-in" style="animation-delay: 0.2s;">
+            <div class="card glass-card border-0 h-100 p-4 text-center">
+                <div class="fs-1 mb-3">🤝</div>
+                <h4 class="fw-bold">Build a Pack</h4>
+                <p class="text-muted mb-0">Follow other pets, like their posts, and leave comments to grow your community.</p>
+            </div>
+        </div>
+        <div class="col-md-4 animate-fade-in" style="animation-delay: 0.3s;">
+            <div class="card glass-card border-0 h-100 p-4 text-center">
+                <div class="fs-1 mb-3">🏠</div>
+                <h4 class="fw-bold">Find a Home</h4>
+                <p class="text-muted mb-0">Helping adoptable pets find their forever families through our Global Pack feed.</p>
+            </div>
+        </div>
     </div>
 {% endblock %}

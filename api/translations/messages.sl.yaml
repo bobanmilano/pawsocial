@@ -1,0 +1,8 @@
+herd:
+    title: "Moja čreda"
+    header: "Čreda uporabnika %name%"
+    member: "Član črede"
+    protector: "Varuh črede"
+    empty: "V tej čredi še ni članov"
+    add_pet: "Nov čredni član"
+    nav: "🐕 Moja čreda"

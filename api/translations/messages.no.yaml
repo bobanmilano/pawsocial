@@ -1,0 +1,8 @@
+herd:
+    title: "Min flokk"
+    header: "%name%s flokk"
+    member: "Flokkmedlem"
+    protector: "Flokkbeskytter"
+    empty: "Ingen medlemmer i denne flokken ennå"
+    add_pet: "Nytt flokkmedlem"
+    nav: "🐕 Min flokk"

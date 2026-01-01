@@ -3,112 +3,213 @@
 {% block title %}My Pack{% endblock %}
 
 {% block body %}
-    <div class="profile-header text-center mb-5 position-relative">
-        {# Cover Image Section #}
-        {% if profileUser.coverImageName %}
-            <div class="cover-image-container position-relative mb-5" style="height: 450px; overflow: hidden; border-radius: 0 0 15px 15px;">
-                <picture>
-                    <source media="(max-width: 575px)" srcset="{{ asset('/uploads/covers/' ~ profileUser.coverImageName) | imagine_filter('cover_mobile') }}">
-                    <source media="(max-width: 991px)" srcset="{{ asset('/uploads/covers/' ~ profileUser.coverImageName) | imagine_filter('cover_tablet') }}">
-                    <img src="{{ asset('/uploads/covers/' ~ profileUser.coverImageName) | imagine_filter('cover_desktop') }}" 
-                         alt="Cover Image" 
-                         class="w-100 h-100" 
-                         style="object-fit: cover;">
-                </picture>
-            </div>
-            {# Adjust Avatar Position to overlap cover (75% of 120px = 90px) #}
-            <div class="position-relative" style="margin-top: -90px;">
-        {% else %}
-             <div class="cover-placeholder bg-secondary mb-3" style="height: 200px; border-radius: 0 0 15px 15px; opacity: 0.8;"></div>
-             <div class="position-relative" style="margin-top: -90px;">
-        {% endif %}
-        {% if profileUser.imageName %}
-            <img src="{{ asset('/uploads/avatars/' ~ profileUser.imageName) }}" class="rounded-circle mb-3 shadow" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid white;" alt="Avatar">
-        {% else %}
-            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto mb-3 shadow" style="width: 120px; height: 120px; font-size: 3rem; border: 4px solid white;">👤</div>
-        {% endif %}
-        
-        <h1 class="h2">{{ profileUser.firstName ? profileUser.firstName ~ ' ' ~ profileUser.lastName : profileUser.email }}</h1>
-        <p class="text-muted mb-2">{{ profileUser.organizationName ?? (profileUser.accountType|capitalize ~ ' Account') }}</p>
+    <div class="row justify-content-center" 
+         data-controller="profile-image-edit"
+         data-profile-image-edit-user-id-value="{{ profileUser.id }}">
+        <div class="col-12">
+            {# Hidden File Input #}
+            <input type="file" 
+                   class="d-none" 
+                   accept="image/*" 
+                   data-profile-image-edit-target="input"
+                   data-action="change->profile-image-edit#onFileChange">
 
-        <!-- Follow Button Area -->
-        <div class="mb-3">
-             {% include 'follow/_button.html.twig' with {'user': profileUser} %}
-        </div>
-        
-        {% if app.user == profileUser %}
-            <a href="{{ path('app_edit_profile') }}" class="btn btn-outline-primary btn-sm rounded-pill px-4">Edit Profile</a>
-        {% endif %}
-    </div>
-
-    {# 2. Pets Section (Horizontal Row) #}
-    <div class="container mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="fw-bold">My Pets 🐾</h4>
-            {% if app.user == profileUser %}
-                <a href="{{ path('app_add_animal') }}" class="btn btn-sm btn-outline-primary rounded-pill">
-                    + Add Pet
-                </a>
-            {% endif %}
-        </div>
-
-        {% if animals is empty %}
-            <div class="alert alert-light border text-center py-4">
-                <p class="mb-2">No pets added yet.</p>
-                {% if app.user == profileUser %}
-                    <a href="{{ path('app_add_animal') }}" class="btn btn-sm btn-primary">Add Pet</a>
-                {% endif %}
-            </div>
-        {% else %}
-            {# Horizontal Scrollable Row for Pets #}
-            <div class="d-flex overflow-auto pb-3 gap-3" style="scrollbar-width: thin;">
-                {% for animal in animals %}
-                    <div class="card shadow-sm border-0 flex-shrink-0" style="width: 280px;">
-                        {% set emoji = animal.species == 'dog' ? '🐶' : (animal.species == 'cat' ? '🐱' : '🐾') %}
-                        
-                        <div class="position-relative">
-                            {% if animal.imageName %}
-                                <img src="{{ asset('/uploads/animals/' ~ animal.imageName) }}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="{{ animal.name }}">
-                            {% else %}
-                                <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 180px; font-size: 3rem;">
-                                    {{ emoji }}
-                                </div>
-                            {% endif %}
-                            
-                            {% if animal.isAdoptable %}
-                                <div class="position-absolute top-0 end-0 m-2 badge bg-success shadow-sm">Adopt Me</div>
-                            {% endif %}
+            {# 1. Profile Header #}
+            <div class="card glass-card border-0 mb-5 overflow-hidden animate-fade-in" style="margin-top: -20px;">
+                {# Cover Section #}
+                <div class="position-relative group" style="height: 440px;">
+                    {% if profileUser.coverImageName %}
+                        <img src="{{ asset('/uploads/covers/' ~ profileUser.coverImageName) }}" 
+                             class="w-100 h-100 group-hover-scale" 
+                             style="object-fit: cover;" 
+                             alt="Cover"
+                             data-profile-image-edit-target="previewCover">
+                    {% else %}
+                        <div class="w-100 h-100 bg-premium bg-opacity-10 d-flex align-items-center justify-content-center"
+                             data-profile-image-edit-target="previewCover">
+                            <i class="bi bi-image fs-1 opacity-10"></i>
                         </div>
+                    {% endif %}
+                    
+                    {# Cover Edit Button #}
+                    {% if app.user == profileUser or profileUser.isManagedBy(app.user) %}
+                    <button class="btn btn-white-glass btn-sm position-absolute top-0 end-0 m-4 shadow-sm group-hover-opacity-100"
+                            data-action="click->profile-image-edit#openEdit"
+                            data-type="cover">
+                        <i class="bi bi-pencil-fill me-2"></i> Change Cover
+                    </button>
+                    {% endif %}
 
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <h5 class="card-title fw-bold mb-0">{{ animal.name }}</h5>
-                                <small class="text-muted">{{ animal.gender|capitalize }}</small>
-                            </div>
-                            <p class="card-text small text-muted mb-2">
-                                {{ animal.species|capitalize }} • {{ animal.breed ?? 'Unknown' }}
-                            </p>
+                    <div class="position-absolute bottom-0 start-0 w-100 px-4 pb-0 px-md-5 d-flex align-items-end gap-4 bg-gradient-dark-transparent">
+                        <div class="position-relative group" style="margin-bottom: -75px;">
+                            {% if profileUser.imageName %}
+                                <img src="{{ asset('/uploads/avatars/' ~ profileUser.imageName) }}" 
+                                     class="rounded-circle shadow-lg border border-4 border-white group-hover-scale" 
+                                     style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar"
+                                     data-profile-image-edit-target="previewAvatar">
+                            {% else %}
+                                <div class="rounded-circle bg-white shadow-lg d-flex align-items-center justify-content-center border border-4 border-white" 
+                                     style="width: 150px; height: 150px; font-size: 4rem;"
+                                     data-profile-image-edit-target="previewAvatar">👤</div>
+                            {% endif %}
                             
-                            {% if app.user == profileUser %}
-                                <a href="{{ path('app_edit_animal', {id: animal.id}) }}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Manage</a>
+                            {# Avatar Edit Button #}
+                            {% if app.user == profileUser or profileUser.isManagedBy(app.user) %}
+                            <button class="btn btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 shadow-sm group-hover-opacity-100 p-2 border-2 border-white"
+                                    style="width: 42px; height: 42px;"
+                                    data-action="click->profile-image-edit#openEdit"
+                                    data-type="avatar">
+                                <i class="bi bi-camera-fill fs-5"></i>
+                            </button>
                             {% endif %}
                         </div>
                     </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
+                </div>
+                
+                <div class="card-body p-0" style="padding: 10px !important;">
+                    {# Profile Metadata below Cover #}
+                    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+                        <div class="ps-md-5" style="margin-left: 175px;">
+                             <h1 class="fw-bold mb-1 text-dark d-flex align-items-center flex-wrap">
+                                {{ profileUser.firstName ? profileUser.firstName ~ ' ' ~ profileUser.lastName : profileUser.email }}
+                                {% if 'ROLE_PET' in profileUser.roles %}
+                                    <span class="fs-4 ms-2">🐾</span>
+                                {% endif %}
+                            </h1>
+                            <p class="text-muted mb-2 fw-semibold">
+                                <i class="bi bi-person-circle me-1 opacity-50"></i> 
+                                {% if 'ROLE_PET' in profileUser.roles %}
+                                    {{ profileUser.animalProfile ? profileUser.animalProfile.species|capitalize : 'Pet Account' }}
+                                {% else %}
+                                    {{ profileUser.organizationName ?? (profileUser.accountType|capitalize ~ ' Account') }}
+                                {% endif %}
+                            </p>
+                            <div class="d-flex gap-2">
+                                 {% if app.user != profileUser and not profileUser.isManagedBy(app.user) %}
+                                    {% include 'follow/_button.html.twig' with {'user': profileUser} %}
+                                 {% endif %}
+                            </div>
+                        </div>
 
-    {# 3. Main Content & Sidebar (2/3 + 1/3) #}
-    <div class="row">
-        {# Left Column: Main Stream (2/3) #}
+                        {# Management Dropdown for Owners #}
+                        {% if app.user == profileUser or profileUser.isManagedBy(app.user) %}
+                            <div class="dropdown">
+                                <button class="btn btn-light rounded-circle shadow-sm border border-opacity-10 d-flex align-items-center justify-content-center bg-white" 
+                                        type="button" 
+                                        data-bs-toggle="dropdown" 
+                                        aria-expanded="false"
+                                        style="width: 42px; height: 42px;">
+                                    <i class="bi bi-gear-fill text-dark fs-5"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg glass-card p-2" style="min-width: 200px;">
+                                    <li>
+                                        <a href="{{ path('app_edit_profile', {id: profileUser.id}) }}" class="dropdown-item d-flex align-items-center gap-2 rounded-3 py-2">
+                                            <i class="bi bi-pencil-square text-primary"></i> Edit Profile
+                                        </a>
+                                    </li>
+                                    {% if profileUser.accountType == 'pet' and profileUser.animalProfile %}
+                                        <li>
+                                            <a href="{{ path('app_edit_animal', {id: profileUser.animalProfile.id}) }}" class="dropdown-item d-flex align-items-center gap-2 rounded-3 py-2">
+                                                <i class="bi bi-gear text-primary"></i> Pet Details
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-4 mt-1 border-top pt-3">
+                        <div class="text-center px-3 border-end">
+                            <div class="fw-bold fs-4">{{ posts|length }}</div>
+                            <div class="small text-muted text-uppercase fw-bold">Posts</div>
+                        </div>
+                        <div class="text-center px-3 border-end">
+                            <div class="fw-bold fs-4">{{ profileUser.followers|length }}</div>
+                            <div class="small text-muted text-uppercase fw-bold">Followers</div>
+                        </div>
+                        <div class="text-center px-3">
+                            <div class="fw-bold fs-4">{{ profileUser.following|length }}</div>
+                            <div class="small text-muted text-uppercase fw-bold">Following</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# 2. Main Content & Sidebar #}
         <div class="col-lg-8">
+            {# Pets Section #}
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold d-flex align-items-center gap-2">
+                    <span class="p-2 rounded-circle bg-primary bg-opacity-10 text-primary fs-5">🐾</span> 
+                    {{ (app.user == profileUser ? 'herd.title'|trans : 'herd.header'|trans({'%name%': profileUser.firstName})) }}
+                </h4>
+                {% if app.user == profileUser %}
+                    <a href="{{ path('app_add_animal') }}" class="btn btn-premium btn-sm rounded-pill px-3 shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i> {{ 'herd.add_pet'|trans }}
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if packMembers is empty %}
+                <div class="card glass-card border-0 mb-5 p-5 text-center bg-white bg-opacity-50">
+                    <div class="py-4">
+                        <div class="fs-1 opacity-25 mb-3">🦓</div>
+                        <h5 class="fw-bold text-muted">{{ 'herd.empty'|trans }}</h5>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row g-4 mb-5">
+                    {% for member in packMembers %}
+                        <div class="col-md-6 col-xl-4 animate-fade-in" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                            <div class="card glass-card border-0 h-100 shadow-sm hover-up overflow-hidden">
+                                {% set isPet = member.accountType == 'pet' %}
+                                {% set animal = member.animalProfile %}
+                                {% set emoji = isPet ? (animal and animal.species == 'dog' ? '🐶' : (animal and animal.species == 'cat' ? '🐱' : '🐾')) : '🐾' %} {# Fixed: pet emoji fallback #}
+                                
+                                <div class="position-relative" style="height: 180px;">
+                                    {% if member.imageName %}
+                                        <img src="{{ asset('/uploads/avatars/' ~ member.imageName) }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ member.firstName }}">
+                                    {% elseif isPet and animal and animal.imageName %}
+                                        <img src="{{ asset('/uploads/animals/' ~ animal.imageName) }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ member.firstName }}">
+                                    {% else %}
+                                        <div class="w-100 h-100 bg-premium bg-opacity-10 d-flex align-items-center justify-content-center fs-1">
+                                            {{ emoji }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="position-absolute bottom-0 start-0 m-3">
+                                        <span class="badge bg-white text-dark shadow-sm rounded-pill px-3">{{ isPet ? (animal ? animal.species|capitalize : 'Pet') : 'Owner' }}</span>
+                                    </div>
+                                </div>
+                                <div class="card-body p-4 text-center">
+                                    <h5 class="fw-bold mb-1">{{ member.firstName }} {{ member.lastName }}</h5>
+                                    {% if isPet %}
+                                        <p class="text-muted small mb-3">
+                                            <i class="bi bi-tag-fill me-1 opacity-50"></i> {{ animal.breed ?? 'Pure Breed' }}
+                                        </p>
+                                    {% else %}
+                                        <p class="text-muted small mb-3">{{ 'herd.protector'|trans }}</p>
+                                    {% endif %}
+                                    <a href="{{ path('app_user_profile', {id: member.id}) }}" class="btn btn-light w-100 rounded-pill border-0 shadow-sm small fw-bold py-2">
+                                        View Profile
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {# Posts Stream #}
+            <h4 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                <span class="p-2 rounded-circle bg-primary bg-opacity-10 text-primary fs-5">📸</span> 
+                Moments
+            </h4>
+            
             {% if posts is empty %}
-                <div class="text-center text-muted py-5 border rounded bg-light">
-                    <p>No moments shared yet.</p>
-                    {% if app.user == profileUser %}
-                        <a href="{{ path('app_feed') }}" class="btn btn-outline-primary btn-sm rounded-pill">Share a moment</a>
-                    {% endif %}
+                <div class="card glass-card border-0 p-5 text-center bg-white bg-opacity-30">
+                    <p class="text-muted mb-0">No moments shared here yet.</p>
                 </div>
             {% else %}
                 {% for post in posts|sort((a, b) => b.createdAt <=> a.createdAt) %}
@@ -117,53 +218,143 @@
             {% endif %}
         </div>
 
-        {# Right Column: Sidebar (1/3) #}
+        {# Right Column: Sidebar #}
         <div class="col-lg-4">
-            {# Personal Cards / Info Section #}
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold mb-3">About</h5>
-                    <ul class="list-unstyled mb-0">
-                        <li class="mb-2"><i class="bi bi-geo-alt me-2 text-muted"></i> {{ profileUser.location ?? 'Unknown Location' }}</li>
-                        <li class="mb-2"><i class="bi bi-calendar3 me-2 text-muted"></i> Joined {{ profileUser.createdAt|date('M Y') }}</li>
-                        {% if profileUser.website %}
-                             <li class="mb-2"><i class="bi bi-link-45deg me-2 text-muted"></i> <a href="{{ profileUser.website }}" target="_blank" class="text-decoration-none">{{ profileUser.website }}</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold mb-3">Pack Members</h5>
-                     {# Followers / Friends Placeholder #}
-                     <div class="d-flex flex-wrap gap-2">
-                         {% for follower in profileUser.followers|slice(0, 6) %}
-                             <a href="#" title="{{ follower.firstName }}" class="text-decoration-none">
-                                {# Avatar logic would go here #}
-                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px;">
-                                    {{ follower.firstName|slice(0,1) }}
+            <div class="sticky-top" style="top: 100px; z-index: 10;">
+                {# Info Card #}
+                <div class="card glass-card border-0 mb-4 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">Details</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-3 d-flex align-items-center gap-3">
+                                <span class="p-2 rounded-3 bg-light text-primary shadow-sm"><i class="bi bi-geo-alt"></i></span>
+                                <div>
+                                    <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Location</div>
+                                    <div class="fw-semibold">{{ profileUser.location ?? 'Worldwide' }}</div>
                                 </div>
-                             </a>
-                         {% else %}
-                            <p class="text-muted small">No followers yet.</p>
-                         {% endfor %}
-                     </div>
+                            </li>
+                            <li class="mb-3 d-flex align-items-center gap-3">
+                                <span class="p-2 rounded-3 bg-light text-primary shadow-sm"><i class="bi bi-calendar-event"></i></span>
+                                <div>
+                                    <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Joined</div>
+                                    <div class="fw-semibold">{{ profileUser.createdAt|date('M Y') }}</div>
+                                </div>
+                            </li>
+                            {% if 'ROLE_PET' in profileUser.roles and profileUser.animalProfile %}
+                                {% set animal = profileUser.animalProfile %}
+                                <li class="mb-3 d-flex align-items-center gap-3">
+                                    <span class="p-2 rounded-3 bg-light text-primary shadow-sm"><i class="bi bi-gender-ambiguous"></i></span>
+                                    <div>
+                                        <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Gender</div>
+                                        <div class="fw-semibold">{{ animal.gender|capitalize }}</div>
+                                    </div>
+                                </li>
+                                <li class="mb-3 d-flex align-items-center gap-3">
+                                    <span class="p-2 rounded-3 bg-light text-primary shadow-sm"><i class="bi bi-tag"></i></span>
+                                    <div>
+                                        <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Breed</div>
+                                        <div class="fw-semibold">{{ animal.breed ?? 'Unknown' }}</div>
+                                    </div>
+                                </li>
+                                {% if animal.birthDate %}
+                                    <li class="mb-3 d-flex align-items-center gap-3">
+                                        <span class="p-2 rounded-3 bg-light text-primary shadow-sm"><i class="bi bi-hourglass-split"></i></span>
+                                        <div>
+                                            <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Age</div>
+                                            <div class="fw-semibold">{{ animal.birthDate|date('Y') == "now"|date('Y') ? 'Puppy/Kitten' : date().diff(animal.birthDate).y ~ ' years' }}</div>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                            {% if profileUser.website %}
+                                <li class="d-flex align-items-center gap-3">
+                                    <span class="p-2 rounded-3 bg-light text-primary shadow-sm"><i class="bi bi-link-45deg"></i></span>
+                                    <div class="text-truncate">
+                                        <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Website</div>
+                                        <a href="{{ profileUser.website }}" target="_blank" class="fw-semibold text-decoration-none text-primary">{{ profileUser.website|replace({'https://': '', 'http://': ''}) }}</a>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+                {# Network Card #}
+                <div class="card glass-card border-0 mb-4 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">Recent Connection</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for follower in profileUser.followers|slice(0, 8) %}
+                                <a href="{{ path('app_user_profile', {id: follower.id}) }}" class="avatar-link hover-up" title="{{ follower.firstName }}">
+                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center border-2 border-white shadow-sm fw-bold" style="width: 45px; height: 45px; font-size: 0.9rem;">
+                                        {{ follower.firstName|slice(0,1) }}
+                                    </div>
+                                </a>
+                            {% else %}
+                                <p class="text-muted small mb-0 w-100 text-center py-3">No pack members yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {# Photos Card #}
+                <div class="card glass-card border-0 shadow-sm overflow-hidden">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">Gallery</h5>
+                        <div class="row g-2">
+                             {% for post in posts|filter(p => p.imageName)|slice(0, 6) %}
+                                 <div class="col-4">
+                                     <a href="{{ path('app_post_show', {id: post.id}) }}" class="d-block ratio ratio-1x1 hover-scale overflow-hidden rounded-3 shadow-sm">
+                                         <img src="{{ asset('/uploads/posts/' ~ post.imageName) }}" class="w-100 h-100" style="object-fit: cover;" alt="Post image">
+                                     </a>
+                                 </div>
+                             {% else %}
+                                 <div class="col-12 text-center py-4">
+                                     <i class="bi bi-images fs-2 opacity-10"></i>
+                                     <p class="text-muted small mt-2">No photos yet</p>
+                                 </div>
+                             {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            {# Photos / Media Placeholder #}
-             <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold mb-3">Photos</h5>
-                    <div class="row g-1">
-                        {# Just a placeholder grid #}
-                        <div class="col-4"><div class="bg-light ratio ratio-1x1 rounded"></div></div>
-                        <div class="col-4"><div class="bg-light ratio ratio-1x1 rounded"></div></div>
-                        <div class="col-4"><div class="bg-light ratio ratio-1x1 rounded"></div></div>
+        </div>
+
+        {# Cropping Modal #}
+        <div class="modal fade" 
+             id="cropperModal" 
+             tabindex="-1" 
+             aria-labelledby="cropperModalLabel" 
+             aria-hidden="true"
+             data-profile-image-edit-target="modal"
+             data-action="shown.bs.modal->profile-image-edit#onModalShow">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content glass-card border-0 shadow-lg">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <h5 class="modal-title fw-bold" id="cropperModalLabel">Adjust Image</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="rounded-4 overflow-hidden bg-light mb-3" style="max-height: 500px;">
+                            <img src="" data-profile-image-edit-target="image" class="img-fluid" style="display: block; max-width: 100%;">
+                        </div>
+                        <div class="text-center text-muted small">
+                            <i class="bi bi-info-circle me-1"></i> Drag to reposition, scroll to zoom.
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" 
+                                class="btn btn-premium rounded-pill px-5 shadow-sm" 
+                                data-action="click->profile-image-edit#save">
+                            Confirm & Save
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    {# Fallback Cropper CSS if not loaded via ImportMap #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
 {% endblock %}

@@ -44,89 +44,79 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ProfileController extends AbstractController
 {
     #[Route('/', name: 'app_my_pack')]
-    public function index(\App\Repository\PostRepository $postRepository): Response
+    public function index(\App\Repository\PostRepository $postRepository, \App\Repository\UserRepository $userRepository): Response
     {
-        // Get current user's animals (Assuming ManyToOne from Animal -> User is set up)
-        // Since we didn't add the `animals` OneToMany property to User explicitly in the make loop (we said 'yes' but check logic),
-        // we can fetch via repository or rely on the User object if the relation was mapped.
-        // Let's rely on the User object being the owner.
-
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
 
-        // If the relation isn't explicitly mapped in User.php (OneToMany), we can fetch via Repository.
-        // But normally make:entity handles this. Let's assume User has getAnimals() or we fetch by owner.
-        // Actually, looking at User.php previously, we didn't see `animals` property there yet?
-        // Let's double check User.php content. If missing, we fetch via repo.
-
-        /** @var \App\Repository\PostRepository $postRepository */
-        // We can access posts via relationship or repo. Relationship is easier but unsorted.
-        // Let's rely on relationship for now or we can sort in memory.
-        // Actually, let's just pass the posts from the user object, assuming we might want to sort them in Twig or here.
-        // Better: let's fetch them sorted via specialized logic or simply access them.
-
-        // For simple reverse chronological order, let's use the criteria or sort in Twig.
-        // Or simpler: access via getter.
-
         return $this->render('profile/my_pack.html.twig', [
             'profileUser' => $user,
-            'animals' => $user->getAnimals(),
+            'packMembers' => $this->getPackMembers($user, $userRepository),
             'posts' => $postRepository->findProfilePosts($user),
         ]);
     }
 
-    #[Route('/edit', name: 'app_edit_profile')]
-    public function editProfile(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/edit/{id}', name: 'app_edit_profile', defaults: ['id' => null])]
+    public function editProfile(?User $user, Request $request, EntityManagerInterface $entityManager): Response
     {
-        /** @var User $user */
-        $user = $this->getUser();
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
 
-        $form = $this->createForm(UserProfileType::class, $user);
+        // If no ID, target current user
+        $targetUser = $user ?? $currentUser;
+
+        // Security: Can only edit self or managed account
+        if ($targetUser !== $currentUser && !$targetUser->isManagedBy($currentUser)) {
+            throw $this->createAccessDeniedException('You do not have permission to edit this profile.');
+        }
+
+        $form = $this->createForm(UserProfileType::class, $targetUser);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+
+            // Update session locale for immediate effect
+            $request->getSession()->set('_locale', $targetUser->getLocale());
+
             $this->addFlash('success', 'Profile updated successfully!');
-            return $this->redirectToRoute('app_my_pack');
+
+            return $this->redirectToRoute('app_user_profile', ['id' => $targetUser->getId()]);
         }
 
         return $this->render('profile/edit_profile.html.twig', [
-            'form' => $form,
-        ]);
+            'form' => $form->createView(),
+            'targetUser' => $targetUser
+        ], new Response(null, $form->isSubmitted() ? 422 : 200));
     }
 
     #[Route('/add-animal', name: 'app_add_animal')]
     public function addAnimal(Request $request, EntityManagerInterface $entityManager, \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $userPasswordHasher): Response
     {
         $animal = new Animal();
-        // We do NOT set owner directly anymore. We need to create a User account for this animal.
-
         $form = $this->createForm(AnimalType::class, $animal);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Create the Pet Account (User)
             $petUser = new User();
-            $petUser->setFirstName($animal->getName()); // Use animal name as First Name
-            // Generate a unique email
+            $petUser->setFirstName($animal->getName());
             $petUser->setEmail('pet_' . uniqid() . '@pawsocial.internal');
             $petUser->setRoles(['ROLE_PET']);
             $petUser->setAccountType('pet');
-            $currentUser = $this->getUser();
-            if (!$currentUser instanceof User) {
-                throw new \LogicException('User must be logged in.');
-            }
-            $petUser->setManagedBy($currentUser);
 
-            // Dummy password (required)
+            /** @var User $currentUser */
+            $currentUser = $this->getUser();
+
+            // Use the bi-directional adder to keep collections in sync
+            $currentUser->addManagedAccount($petUser);
+
             $petUser->setPassword(
                 $userPasswordHasher->hashPassword(
                     $petUser,
-                    'pet_password_' . uniqid() // Random password, owner switches in
+                    'pet_password_' . uniqid()
                 )
             );
 
-            // Link Animal Profile to Pet User
             $animal->setUserAccount($petUser);
 
             $entityManager->persist($petUser);
@@ -149,9 +139,11 @@ class ProfileController extends AbstractController
     {
         // Security check: ManagedBy check
         $petUser = $animal->getUserAccount();
-        if (!$petUser || $petUser->getManagedBy() !== $this->getUser()) {
-            // Allow if self (if logged in as pet)
-            if ($this->getUser() !== $petUser) {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        if (!$petUser || $petUser->getManagedBy() !== $currentUser) {
+            if ($currentUser !== $petUser) {
                 throw $this->createAccessDeniedException();
             }
         }
@@ -160,8 +152,10 @@ class ProfileController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            // Update User name to match Animal name if changed
+            $petUser->setFirstName($animal->getName());
 
+            $entityManager->flush();
             $this->addFlash('success', 'Pet profile updated!');
 
             return $this->redirectToRoute('app_my_pack');
@@ -172,13 +166,40 @@ class ProfileController extends AbstractController
             'title' => 'Edit ' . $animal->getName()
         ]);
     }
+
     #[Route('/profile/{id}', name: 'app_user_profile')]
-    public function show(User $user, \App\Repository\PostRepository $postRepository): Response
+    public function show(User $user, \App\Repository\PostRepository $postRepository, \App\Repository\UserRepository $userRepository): Response
     {
         return $this->render('profile/my_pack.html.twig', [
-            'profileUser' => $user, // Use the requested user, not current user
-            'animals' => $user->getAnimals(),
+            'profileUser' => $user,
+            'packMembers' => $this->getPackMembers($user, $userRepository),
             'posts' => $postRepository->findProfilePosts($user),
         ]);
+    }
+
+    /**
+     * Helper to get family/pack members based on account type.
+     * 
+     * @param User $user
+     * @param \App\Repository\UserRepository $userRepository
+     * @return User[]
+     */
+    private function getPackMembers(User $user, \App\Repository\UserRepository $userRepository): array
+    {
+        if ($user->getAccountType() === 'pet' && $user->getManagedBy()) {
+            $owner = $user->getManagedBy();
+            $members = [$owner];
+            // Fetch siblings directly from repository to be sure
+            $siblings = $userRepository->findBy(['managedBy' => $owner]);
+            foreach ($siblings as $sibling) {
+                if ($sibling->getId() !== $user->getId()) {
+                    $members[] = $sibling;
+                }
+            }
+            return $members;
+        }
+
+        // Fetch managed accounts directly from repository
+        return $userRepository->findBy(['managedBy' => $user]);
     }
 }

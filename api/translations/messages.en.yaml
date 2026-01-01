@@ -1,0 +1,9 @@
+herd:
+    title: "My Herd"
+    header: "%name%'s Herd"
+    member: "Herd Member"
+    protector: "Herd Protector"
+    empty: "No members in this herd yet"
+    add_pet: "New Herd Member"
+    leader: "Family Leader" # Keeping legacy for comparison or use "Protector"
+    nav: "🐕 My Herd"

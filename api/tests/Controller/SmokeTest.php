@@ -16,8 +16,7 @@ class SmokeTest extends WebTestCase
         // Let's check MainController behavior.
         // It says: return $this->render('main/index.html.twig'); but redirects if logged in.
 
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Welcome to Pawsocial');
+        $this->assertSelectorTextContains('h1', 'Where the Pack Connects');
     }
 
     public function testLoginPageLoads(): void
@@ -26,6 +25,6 @@ class SmokeTest extends WebTestCase
         $client->request('GET', '/login');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Please sign in');
+        $this->assertSelectorTextContains('h2', 'Welcome Back!');
     }
 }

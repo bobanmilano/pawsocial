@@ -1,0 +1,8 @@
+herd:
+    title: "Mo thréad"
+    header: "Tréad %name%"
+    member: "Ball den tréad"
+    protector: "Cosantóir tréada"
+    empty: "Níl aon bhaill sa tréad seo fós"
+    add_pet: "Ball nua den tréad"
+    nav: "🐕 Mo thréad"

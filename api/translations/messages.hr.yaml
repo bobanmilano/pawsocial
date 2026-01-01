@@ -1,0 +1,8 @@
+herd:
+    title: "Moje krdo"
+    header: "Krdo korisnika %name%"
+    member: "Član krda"
+    protector: "Čuvar krda"
+    empty: "Još nema članova u ovom krdu"
+    add_pet: "Novi član krda"
+    nav: "🐕 Moje krdo"

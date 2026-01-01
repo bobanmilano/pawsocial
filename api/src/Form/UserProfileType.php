@@ -46,9 +46,50 @@ class UserProfileType extends AbstractType
             ->add('houseNumber', TextType::class, ['required' => false])
             ->add('zipCode', TextType::class, ['required' => true])
             ->add('city', TextType::class, ['required' => true])
-            ->add('country', \Symfony\Component\Form\Extension\Core\Type\CountryType::class, [
+            ->add('country', \Symfony\Component\Form\Extension\Core\Type\ChoiceType::class, [
                 'required' => true,
-                'preferred_choices' => ['DE', 'AT', 'CH'],
+                'choices' => [
+                    'Germany' => 'DE',
+                    'Austria' => 'AT',
+                    'Switzerland' => 'CH',
+                    'France' => 'FR',
+                    'Italy' => 'IT',
+                    'Spain' => 'ES',
+                    'Netherlands' => 'NL',
+                    'Poland' => 'PL',
+                    'Portugal' => 'PT',
+                    'Sweden' => 'SE',
+                    'Denmark' => 'DK',
+                    'Finland' => 'FI',
+                    'Greece' => 'GR',
+                    'Czech Republic' => 'CZ',
+                    'Hungary' => 'HU',
+                    'Romania' => 'RO',
+                    'Bulgaria' => 'BG',
+                    'Croatia' => 'HR',
+                    'Slovakia' => 'SK',
+                    'Slovenia' => 'SI',
+                    'Estonia' => 'EE',
+                    'Latvia' => 'LV',
+                    'Lithuania' => 'LT',
+                    'Ireland' => 'IE',
+                    'Malta' => 'MT',
+                    'Belgium' => 'BE',
+                    'Cyprus' => 'CY',
+                    'Luxembourg' => 'LU',
+                    'Liechtenstein' => 'LI',
+                    'Serbia' => 'RS',
+                    'Norway' => 'NO',
+                    'Russia' => 'RU',
+                    'United Kingdom' => 'GB',
+                    'Ukraine' => 'UA',
+                    'Turkey' => 'TR',
+                ],
+                'preferred_choices' => ['DE', 'AT', 'CH', 'LI'],
+                'attr' => [
+                    'class' => 'form-select',
+                    'data-controller' => 'form-select'
+                ],
             ])
             ->add('organizationName', TextType::class, [
                 'required' => false,
@@ -72,6 +113,45 @@ class UserProfileType extends AbstractType
                 'label' => 'Cover Image',
                 'delete_label' => 'Delete current cover?',
                 'asset_helper' => true,
+            ])
+            ->add('locale', \Symfony\Component\Form\Extension\Core\Type\ChoiceType::class, [
+                'label' => 'Preferred Language',
+                'choices' => [
+                    'Deutsch' => 'de',
+                    'English' => 'en',
+                    'Français' => 'fr',
+                    'Italiano' => 'it',
+                    'Español' => 'es',
+                    'Nederlands' => 'nl',
+                    'Polski' => 'pl',
+                    'Português' => 'pt',
+                    'Svenska' => 'sv',
+                    'Dansk' => 'da',
+                    'Suomi' => 'fi',
+                    'Ελληνικά' => 'el',
+                    'Čeština' => 'cs',
+                    'Magyar' => 'hu',
+                    'Română' => 'ro',
+                    'Български' => 'bg',
+                    'Hrvatski' => 'hr',
+                    'Slovenčina' => 'sk',
+                    'Slovenščina' => 'sl',
+                    'Eesti' => 'et',
+                    'Latviešu' => 'lv',
+                    'Lietuvių' => 'lt',
+                    'Gaeilge' => 'ga',
+                    'Malti' => 'mt',
+                    'Українська' => 'uk',
+                    'Liechtenstein' => 'li',
+                    'Српски' => 'sr',
+                    'Norsk' => 'no',
+                    'Русский' => 'ru',
+                    'Türkçe' => 'tr',
+                ],
+                'attr' => [
+                    'class' => 'form-select',
+                    'data-controller' => 'form-select'
+                ],
             ])
         ;
     }

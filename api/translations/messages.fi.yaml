@@ -1,0 +1,8 @@
+herd:
+    title: "Minun laumani"
+    header: "Käyttäjän %name% lauma"
+    member: "Lauman jäsen"
+    protector: "Lauman suojelija"
+    empty: "Tässä laumassa ei ole vielä jäseniä"
+    add_pet: "Uusi lauman jäsen"
+    nav: "🐕 Minun laumani"

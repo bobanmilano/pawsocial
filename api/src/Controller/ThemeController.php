@@ -22,28 +22,36 @@ class ThemeController extends AbstractController
         return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_edit_profile'));
     }
 
-    #[Route('/save-custom-colors', name: 'app_save_custom_colors', methods: ['POST'])]
-    public function saveCustomColors(Request $request, \Doctrine\ORM\EntityManagerInterface $entityManager): Response
+    #[Route('/save-custom-colors/{id}', name: 'app_save_custom_colors', defaults: ['id' => null], methods: ['POST'])]
+    public function saveCustomColors(?\App\Entity\User $targetUser, Request $request, \Doctrine\ORM\EntityManagerInterface $entityManager): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof \App\Entity\User) {
+        /** @var \App\Entity\User|null $currentUser */
+        $currentUser = $this->getUser();
+        if (!$currentUser) {
             return $this->redirectToRoute('app_login');
+        }
+        // $currentUser is now known to be non-null and is @var User
+
+        $userToUpdate = $targetUser ?? $currentUser;
+
+        // Security check
+        if ($userToUpdate !== $currentUser && !$userToUpdate->isManagedBy($currentUser)) {
+            throw $this->createAccessDeniedException();
         }
 
         $primaryColor = $request->request->get('primary_color');
         $secondaryColor = $request->request->get('secondary_color');
 
-        $user->setPrimaryColor($primaryColor);
-        $user->setSecondaryColor($secondaryColor);
+        $userToUpdate->setPrimaryColor($primaryColor);
+        $userToUpdate->setSecondaryColor($secondaryColor);
 
         $entityManager->flush();
 
         // Automatically switch to standard theme mode but with user overrides valid
-        // Actually, let's set a specific session flag to indicate "User Custom" is active
         $request->getSession()->set('active_theme', 'custom');
 
-        $this->addFlash('success', 'Custom colors saved! 🎨');
+        $this->addFlash('success', 'Custom colors saved for ' . $userToUpdate->getFirstName() . '! 🎨');
 
-        return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_edit_profile'));
+        return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_edit_profile', ['id' => $userToUpdate->getId()]));
     }
 }

@@ -1,0 +1,8 @@
+herd:
+    title: "Sürüm"
+    header: "%name% kişisinin sürüsü"
+    member: "Sürü üyesi"
+    protector: "Sürü Koruyucusu"
+    empty: "Bu sürüde henüz üye yok"
+    add_pet: "Yeni sürü üyesi"
+    nav: "🐕 Sürüm"

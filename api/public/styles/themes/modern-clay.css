@@ -1,48 +1,41 @@
 :root {
-    --primary-color: #A0522D;
-    /* Sienna / Terracotta */
-    --primary-hover: #8B4513;
-    --secondary-color: #8FBC8F;
-    /* Dark Sea Green */
-    --bg-color: #F0EAD6;
-    /* Eggshell */
-    --card-bg-color: #FDFBF7;
+    --primary-hsl: 19, 56%, 40%;
+    /* Terracotta */
+    --primary-color: hsl(var(--primary-hsl));
+    --secondary-hsl: 120, 20%, 65%;
+    /* Sage Green */
+    --secondary-color: hsl(var(--secondary-hsl));
+
+    --bg-color: #F4F1EA;
+    --card-bg: rgba(253, 251, 247, 0.9);
     --text-color: #3E2723;
-    /* Dark Brown */
     --text-muted: #795548;
 
-    --border-radius-card: 8px;
-    /* Subtle rounding */
-    --border-radius-btn: 8px;
-
-    --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-
-    --font-family: 'Inter', sans-serif;
+    --glass-bg: rgba(253, 251, 247, 0.85);
+    --glass-border: rgba(160, 82, 45, 0.15);
+    --glass-blur: 10px;
+    --glass-shadow: 0 8px 32px rgba(62, 39, 35, 0.05);
 }
 
 body {
-    background-color: var(--bg-color) !important;
-    color: var(--text-color) !important;
-    font-family: var(--font-family) !important;
+    background: linear-gradient(180deg, #F4F1EA 0%, #E8E4D9 100%) !important;
 }
 
 .card {
-    border-radius: var(--border-radius-card) !important;
-    border: none !important;
-    box-shadow: var(--box-shadow) !important;
-    background-color: var(--card-bg-color) !important;
+    background: var(--card-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow) !important;
 }
 
 .btn-primary {
-    background-color: var(--secondary-color) !important;
-    /* Green buttons */
-    border-color: var(--secondary-color) !important;
-    color: white !important;
-    border-radius: var(--border-radius-btn) !important;
+    background: var(--primary-color) !important;
+    border: none !important;
+    border-radius: var(--border-radius-md) !important;
+    box-shadow: 0 4px 10px rgba(160, 82, 45, 0.2) !important;
 }
 
 .navbar {
-    background-color: #FFFFFF !important;
+    background: rgba(255, 255, 255, 0.9) !important;
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 3px solid var(--secondary-color) !important;
 }

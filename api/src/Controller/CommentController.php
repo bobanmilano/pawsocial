@@ -35,7 +35,6 @@ class CommentController extends AbstractController
             $em->persist($comment);
             $em->flush();
 
-            $this->addFlash('success', 'Comment added!');
         } else {
             $this->addFlash('danger', 'Comment cannot be empty.');
         }

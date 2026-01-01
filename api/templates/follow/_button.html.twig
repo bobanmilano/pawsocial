@@ -8,15 +8,15 @@
         {% if isFollowing %}
             <form action="{{ path('app_user_unfollow', {id: user.id}) }}" method="post" class="d-inline">
                 <input type="hidden" name="_token" value="{{ csrf_token('unfollow' ~ user.id) }}">
-                <button type="submit" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-person-check-fill"></i> Unfollow
+                <button type="submit" class="btn btn-outline-secondary btn-sm rounded-pill px-3 hover-scale">
+                    <i class="bi bi-person-check-fill me-1"></i> Unfollow
                 </button>
             </form>
         {% else %}
             <form action="{{ path('app_user_follow', {id: user.id}) }}" method="post" class="d-inline">
                 <input type="hidden" name="_token" value="{{ csrf_token('follow' ~ user.id) }}">
-                <button type="submit" class="btn btn-primary btn-sm">
-                    <i class="bi bi-person-plus"></i> Follow
+                <button type="submit" class="btn btn-premium btn-sm rounded-pill px-4 animate-follow-pop">
+                    <i class="bi bi-person-plus me-2"></i> Follow
                 </button>
             </form>
         {% endif %}

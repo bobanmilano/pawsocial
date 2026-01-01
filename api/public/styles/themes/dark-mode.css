@@ -1,93 +1,82 @@
 :root {
-    --primary-color: #BB86FC;
-    /* Purple */
-    --primary-hover: #985EFF;
-    --secondary-color: #03DAC6;
-    /* Teal */
-    --bg-color: #121212;
-    /* Darkest Grey */
-    --card-bg-color: #1E1E1E;
-    /* Dark Grey */
-    --text-color: #E0E0E0;
-    /* Light Grey */
-    --text-muted: #A0A0A0;
+    --primary-hsl: 261, 80%, 65%;
+    /* Radiant Purple */
+    --primary-color: hsl(var(--primary-hsl));
+    --secondary-hsl: 190, 80%, 50%;
+    /* Electric Blue */
+    --secondary-color: hsl(var(--secondary-hsl));
 
-    --border-radius-card: 12px;
-    --border-radius-btn: 20px;
+    --bg-color: #0f172a;
+    /* Deep Slate */
+    --card-bg: rgba(30, 41, 59, 0.6);
+    --text-color: #f8fafc;
+    --text-muted: #94a3b8;
 
-    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-
-    --font-family: system-ui, -apple-system, sans-serif;
+    --glass-bg: rgba(15, 23, 42, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: 16px;
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
 body {
-    background-color: var(--bg-color) !important;
-    color: var(--text-color) !important;
-    font-family: var(--font-family) !important;
-}
-
-/* Override Bootstrap Text Colors for Dark Mode */
-.text-dark {
-    color: #E0E0E0 !important;
-}
-
-.text-muted {
-    color: #B0B0B0 !important;
-}
-
-.bg-light {
-    background-color: #2C2C2C !important;
-}
-
-.bg-white {
-    background-color: var(--card-bg-color) !important;
+    background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 100%) !important;
     color: var(--text-color) !important;
 }
 
 .card {
-    background-color: var(--card-bg-color) !important;
-    border: 1px solid #333 !important;
-    border-radius: var(--border-radius-card) !important;
-    box-shadow: var(--box-shadow) !important;
+    background: var(--card-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    backdrop-filter: blur(var(--glass-blur));
+    box-shadow: var(--glass-shadow) !important;
+    color: var(--text-color) !important;
 }
 
 .card-header,
+.card-body,
 .card-footer {
-    background-color: var(--card-bg-color) !important;
-    border-color: #333 !important;
+    background: transparent !important;
+    color: inherit !important;
+}
+
+.text-dark {
+    color: #f8fafc !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
 }
 
 .btn-primary {
-    background-color: var(--primary-color) !important;
-    border-color: var(--primary-color) !important;
-    color: #121212 !important;
-    /* Dark text on bright button */
-    font-weight: 600;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
 }
 
 .navbar {
-    background-color: #1F1F1F !important;
-    border-bottom: 1px solid #333;
+    background: rgba(15, 23, 42, 0.8) !important;
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--glass-border) !important;
 }
 
-.navbar-light .navbar-nav .nav-link {
-    color: #E0E0E0 !important;
+.navbar .nav-link {
+    color: #94a3b8 !important;
 }
 
-.navbar-light .navbar-brand {
-    color: var(--primary-color) !important;
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+    color: #f8fafc !important;
 }
 
 .dropdown-menu {
-    background-color: #2C2C2C !important;
-    border-color: #444;
+    background: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid var(--glass-border) !important;
+    backdrop-filter: blur(10px);
 }
 
 .dropdown-item {
-    color: #E0E0E0 !important;
+    color: #f8fafc !important;
 }
 
 .dropdown-item:hover {
-    background-color: #3C3C3C !important;
-    color: white !important;
+    background: rgba(255, 255, 255, 0.1) !important;
 }
